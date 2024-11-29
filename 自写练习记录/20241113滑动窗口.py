@@ -700,12 +700,85 @@ class Solution1():
 		ans=left=0
 		dic_all=Counter(s)
 		dic_win=Counter()
+		if any(dic_all[c]<k for c in 'abc'):
+			return -1
 		for right,c in enumerate(s):
 			dic_win[c]+=1
 			# while dic_all['a']-dic_win['a']<k or dic_all['b']-dic_win['b']<k or dic_all['c']-dic_win['c']<k:
-			whiel dic_all[c]-dic_win[c]<k:
+			while dic_all[c]-dic_win[c]<k:
 				dic_win[s[left]]-=1
 				left += 1
 			ans=max(ans,right-left+1)
 		return len(s)-ans
+## 方法二：灵神滑动窗口
+class Solution2():
+	def takeCharacters(self,s,k):
+		ans=left=0
+		dic_all=Counter(s)
+		if any(dic_all[c]<k for c in 'abc'):
+			return -1
+		for right,c in enumerate(s):
+			dic_all[c] -= 1
+			while dic_all[c] < k:
+				dic_all[s[left]] += 1
+				left += 1
+			ans = max(ans,right-left+1)
+		return len(s)-ans
+
+# 找出最长等值子数组
+## 方法一：自写版
+class Solution1:
+	def longestEqualSubarray(self,nums,k):
+		ans=left=0
+		cnt=0
+		all_dic=Counter(nums)
+		win_lis=[]
+		tmp=0
+		for x in all_dic:
+			if all_dic[x]>tmp:
+				char=x
+				tmp=all_dic[x]
+		for right,c in enumerate(nums):
+			while c!=char:
+				left+=1
+## 方法二：灵神滑动窗口思路
+class Solution2:
+	def longestEqualSubarray(self,nums,k):
+		group_dic={}
+		for i,c in enumerate(nums):
+			if c in group_dic:
+				group_dic[c].append(i-len(group_dic[c]))
+			else:
+				group_dic[c]=[i]
+		ans=0
+		for c in group_dic:
+			if len(group_dic[c])<=ans:
+				continue
+			left=0
+			c_lis=group_dic[c]
+			for right,x in enumerate(c_lis):
+				while x-c_lis[left]>k:
+					left += 1
+				ans=max(ans,right-left+1)
+		return ans
+## 方法三：灵神滑动窗口版
+class Solution3:
+    def longestEqualSubarray(self, nums, k):
+        pos_lists = defaultdict(list)
+        for i, x in enumerate(nums):
+            pos_lists[x].append(i - len(pos_lists[x]))
+
+        ans = 0
+        for pos in pos_lists.values():
+            if len(pos) <= ans:
+                continue  # 无法让 ans 变得更大
+            left = 0
+            for right, p in enumerate(pos):
+                while p - pos[left] > k:  # 要删除的数太多了
+                    left += 1
+                ans = max(ans, right - left + 1)
+        return ans
+
+
+
 
