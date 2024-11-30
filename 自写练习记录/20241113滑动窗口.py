@@ -779,6 +779,137 @@ class Solution3:
                 ans = max(ans, right - left + 1)
         return ans
 
+# 毯子覆盖的最多白色砖块数
+class Solution1:
+	def maximumWhiteTiles(self,tiles,carpetlen):
+		tiles.sort(key=lambda x:x[1])
+		ans=left=0
+		cover=0
+		for tl,tr in tiles:
+			cover+=tr-tl+1
+			while tiles[left][1]<tr-carpetlen+1:
+				cover -= tiles[left][1]-tiles[left][0]+1
+				left += 1
+			uncover=max(tr-carpetlen+1-tiles[left][0],0)
+			ans=max(ans,cover-uncover)
+		return ans
+
+
+# 长度最小的子数组
+class Solution1:
+	def minSubArrayLen(self,target,nums):
+		ans=len(nums)
+		left=0
+		total=0
+		for right,c in enumerate(nums):
+			if total < target:
+				total += c
+				continue
+			ans=min(ans,right-left+1)
+			total -= nums[left]
+			left += 1
+		return ans
+# 灵神滑动窗口:while循环结束后更新答案
+class Solution2:
+	def minSubArrayLen(self,target,nums):
+		n=len(nums)
+		ans=n+1
+		s=left=0
+		for right,x in enumerate(nums): # 枚举子数组右端点
+			s += x
+			while s-nums[left] >= target:  #尽量缩短子数组长度
+				s -= nums[left]
+				left += 1
+			if s >= target:
+				ans=min(ans,right-left+1)
+		return ans if ans<=n else 0
+## 灵神滑动窗口：while循环内更新答案
+class Solution2:
+	def maxSubarrayLength(self,target,nums):
+		n=len(nums)
+		ans=n+1
+		s=left=0
+		for right,x in enumerate(nums):
+			s+=x
+			while s>=target:
+				ans=min(ans,right-left+1)
+				s-=nums[left]
+				left += 1
+		return ans if ans<n else 0
+
+
+class Solution:
+	def minSubArrayLen(self,target,nums):
+		n=len(nums)
+		ans=n+1
+		total=left=0
+		for right,x in enumerate(nums):
+			total+=x
+			while total>=target:
+				ans=min(ans,right-left+1)
+				total-=nums[left]
+				left+=1
+		return ans if ans<=n else 0
+
+
+# 最短且字典序最小的美丽子字符串
+class Solution1:
+	def shortestBeautifulSubstring(self,s,k):
+		n=len(s)
+		dic_win=Counter()
+		left=0
+		substr_lis=[]
+		len_result=n+1
+		for right,c in enumerate(s):
+			dic_win[c]+=1
+			while dic_win['1']==k:
+				substr_lis.append(s[left:right+1])
+				len_result=min(len_result,right-left+1)
+				dic_win[s[left]]-=1
+				left+=1
+		substr_lis.sort()
+		return substr_lis[0] if len_result<=n else ''
+
+# 方法二：
+class Solution2:
+	def shortestBeautifulSubstring(self,s,k):
+		if s.count('1')<k:
+			return ''
+		ans=s
+		cnt1=left=0
+		# bea_str=[]
+		for right,c in enumerate(s):
+			cnt1+=int(c)
+			while cnt1>=k or s[left]=='0':
+				if cnt1==k:
+					temp_str=s[left:right+1]
+					if len(temp_str)<len(ans) or (len(temp_str)=len(ans) and temp_str<ans):
+						ans=temp_str
+						# bea_str.append(temp_str)
+				cnt1-=int(s[left])
+				left+=1
+		bea_str.sort()
+		return bea_str[0]
+
+class Solution3:
+	def shortestBeautifulSubstring(self,s,k):
+		if s.count('1')<k:
+			return ''
+		ans=s
+		cnt1=left=0
+		# bea_str=[]
+		for right,c in enumerate(s):
+			cnt1+=int(c)
+			while cnt1==k:
+				# if cnt1==k:
+				temp_str=s[left:right+1]
+				if len(temp_str)<len(ans) or (len(temp_str)==len(ans) and temp_str<ans):
+					ans=temp_str
+					# bea_str.append(temp_str)
+				cnt1-=int(s[left])
+				left+=1
+		# bea_str.sort()
+		return ans
 
 
 
