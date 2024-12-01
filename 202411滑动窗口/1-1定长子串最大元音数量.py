@@ -26,8 +26,21 @@ class Solution2():
 		return ans
 
 
+## 20241201复习
+class Solution4:
+	def maxVowels(self,s,k):
+		ans=cnt=0
+		for i,c in enumerate(s):
+			cnt+=1 if c in "aeiou" else 0
+			if i < k-1:  # 注意这里的符号
+				continue
+			ans=max(ans,cnt)
+			cnt-=1 if s[i-k+1] in "aeiou" else 0
+		return ans
+
+
 
 s="abciiidef"
 k=3
-cls=Solution2()
+cls=Solution4()
 print(cls.maxVowels(s,k))

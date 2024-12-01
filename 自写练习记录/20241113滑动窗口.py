@@ -912,4 +912,209 @@ class Solution3:
 		return ans
 
 
+# 替换子串得到平衡字符串
+## 方法一：自写版(错误)
+class Solution:
+	def balancedString(self,s):
+		ans=len(s)+1
+		left=0
+		target_num=len(s)/4
+		dic_all=Counter(s)
+		if len(dic_all)==4 and min(dic_all.values())==m:
+			return 0
+		for right,c in enumerate(s):
+			dic_all[c]-=1
+			while max(dic_all.values())<=target_num:
+				dic_all[s[left]]+=1
+				ans=min(ans,right-left+1)
+				left += 1
+		return ans 
+## 方法二：灵神不定长滑动窗口
+class Solution2:
+	def balancedString(self,s):
+		m=len(s)//4
+		cnt=Counter(s)
+		if len(cnt)==4 and min(cnt.values())==m:
+			return 0
+		ans,left=inf,0
+		for right,c in enumerate(s):
+			cnt[c]-=1
+			while max(cnt.values())<=m:
+				ans=min(ans,right-left+1)
+				cnt[nums[left]]+=1
+				left += 1
+		return ans
+## 方法三：滑动窗口内
+class Solution3:
+	def balancedString(self,s):
+		m=len(s)//4
+		dic_win=Counter()
+		dic_all=Counter(s)
+		left=0
+		for right,c in enumerate(s):
+			dic_win[c]+=1
+			while dic_all[c]-1<=target_num:
 
+
+
+# class Solution:
+# 	def minSubArrayLen(self,target,nums):
+# 		ans=len(s)+1
+# 		left=0
+# 		total=0
+# 		for right,c in enumerate(nums):
+# 			total+=c
+# 			while total>=target:
+# 				total-=nums[left]
+# 				ans=min(ans,right-left+1)
+# 				left+=1
+# 		return ans if ans<n else 0
+
+
+
+# 无限数组的最短子数组
+# 方法一：自写版，无法处理target较大的情况
+class Solution1:
+	def minSizeSubarray(self,nums,target):
+		ans,left=inf,0
+		total_win=0
+		n=len(nums)
+		win_len=0
+		new_nums=nums+nums
+		for right,c in enumerate(new_nums):
+			total_win+=new_nums[right]
+			win_len+=1
+			while total_win>=target:
+				if total_win==target:
+					ans=min(ans,win_len)
+				total_win-=new_nums[left]
+				win_len-=1
+				left+=1
+		return ans if ans!=inf else -1
+## 
+class Solution2:
+	def minSizeSubarray(self,nums,target):
+		ans,left=inf,0
+		total_win=0
+		n=len(nums)
+		win_len=0
+		new_nums=nums+nums
+		total=sum(nums)
+		for right,c in enumerate(new_nums):
+			total_win+=new_nums[right]
+			win_len+=1
+			while total_win>=target%total:
+				if total_win==target%total:
+					ans=min(ans,win_len)
+				total_win-=new_nums[left]
+				win_len-=1
+				left+=1
+		return ans+target//total*n if ans!=inf else -1
+
+
+## 方法二：灵神不定长滑动窗口
+class Solution2:
+	def minSizeSubarray(self,nums,target):
+		ans,left=inf,0
+		total_win=0
+		n=len(nums)
+		win_len=0
+		new_nums=nums+nums
+		total=sum(nums)
+		for right,c in enumerate(new_nums):
+			total_win+=new_nums[right]
+			win_len+=1
+			while total_win>target%total:
+				total_win-=new_nums[left]
+				win_len-=1
+				left+=1
+			if total_win==target%total:
+					ans=min(ans,win_len)
+		return ans+target//total*n if ans!=inf else -1
+
+
+# 最小覆盖子串
+## 方法一：自写版
+class Solution1:
+	def minWindow(self,s,t):
+		ans=inf
+		left=0
+		dic_win=Counter()
+		t_dic=Counter(t)
+		result_substr=''
+		for right,c in enumerate(s):
+			if c in t:
+				dic_win[c]+=1
+			while len(dic_win)==len(t_dic):
+				ans=min(ans,right-left+1)
+				result_substr=s[left:right+1]
+				if dic_win[s[left]]>0:
+					if dic_win[s[left]]==1:
+						del dic_win[s[left]]
+					else:
+						dic_win[s[left]]-=1
+				left+=1
+		return result_substr
+
+class Solution1:  # 不能解决窗口内字符数量的问题
+	def minWindow(self,s,t):
+		ans=inf
+		left=0
+		# dic_win=Counter()
+		t_dic=Counter(t)
+		temp_t_dic=Counter(t)
+		result_substr=''
+		for right,c in enumerate(s):
+			if c in t:
+				temp_t_dic[c]-=1
+			while len(temp_t_dic)==0:
+				if right-left+1<ans:
+					result_substr=s[left:right+1]
+					ans=min(ans,right-left+1)
+				if s[left] in t:
+					temp_t_dic[s[left]]+=1
+				left+=1
+		return result_substr
+
+## 灵神滑动窗口
+class Solution3:
+	def minWindow(self,s,t):
+		ans_left,ans_right=-1,len(s)
+		cnt=Counter(t)
+		less=len(cnt)
+		left=0
+		for right,c in enumerate(s):
+			cnt[c]-=1
+			if cnt[c]==0:
+				less-=1
+			while less==0:
+				if right-left-1<ans_right-ans_left-1:
+					ans_left,ans_right=left,right
+				x=s[left]
+				if cnt[x]==0:
+					less+=1
+				cnt[x]+=1
+				left+=1
+		return '' if ans_left<0 else s[ans_left:ans_right+1]
+
+class Solution1:
+	def minWindow(self,s,t):
+		ans=inf
+		left=0
+		dic_win=Counter()
+		t_dic=Counter(t)
+		result_substr=''
+		less=len(t_dic)
+		for right,c in enumerate(s):
+			dic_win[c]+=1
+			if dic_win[c]==t_dic[c]:
+				less-=1
+			while less==0:
+				if ans>right-left+1:
+					ans=min(ans,right-left+1)
+					result_substr=s[left:right+1]
+				if t_dic[s[left]]==dic_win[s[left]]:
+					less+=1
+				dic_win[s[left]]-=1
+				left+=1
+		return result_substr
