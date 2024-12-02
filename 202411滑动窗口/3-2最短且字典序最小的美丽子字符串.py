@@ -59,9 +59,23 @@ class Solution3:
 		# bea_str.sort()
 		return ans
 
+class Solution_re:
+	def shortestBeautifulSubstring(self,s,k):
+		ans=len(s)+1
+		left=cnt_1=0
+		result_substr=s
+		for right,c in enumerate(s):
+			cnt_1+=int(c)
+			while cnt_1>=k:
+				if cnt_1==k and len(result_substr)>(right-left+1):
+					ans=min(ans,right-left+1)
+				cnt_1-=int(s[left])
+				left+=1
+		return result_substr if ans<=len(s) else ''
+
 
 if __name__=='__main__':
 	s="11000111"
 	k=1
-	cls=Solution3()
+	cls=Solution_re()
 	print(cls.shortestBeautifulSubstring(s,k))
