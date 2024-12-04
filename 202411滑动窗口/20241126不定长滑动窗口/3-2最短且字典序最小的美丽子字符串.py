@@ -61,17 +61,18 @@ class Solution3:
 
 class Solution_re:
 	def shortestBeautifulSubstring(self,s,k):
-		ans=len(s)+1
+		ans=s+'1'
 		left=cnt_1=0
-		result_substr=s
+		# result_substr=s
 		for right,c in enumerate(s):
 			cnt_1+=int(c)
-			while cnt_1>=k:
-				if cnt_1==k and len(result_substr)>(right-left+1):
-					ans=min(ans,right-left+1)
+			while cnt_1==k:
+				temp_str=s[left:right+1]
+				if len(temp_str)<len(ans) or (len(temp_str)==len(ans) and temp_str<ans):
+					ans=temp_str
 				cnt_1-=int(s[left])
 				left+=1
-		return result_substr if ans<=len(s) else ''
+		return ans if len(ans)<=len(s) else ''
 
 
 if __name__=='__main__':
