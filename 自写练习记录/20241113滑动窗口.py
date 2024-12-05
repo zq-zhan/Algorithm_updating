@@ -1118,3 +1118,20 @@ class Solution1:
 				dic_win[s[left]]-=1
 				left+=1
 		return result_substr
+## 20241204思路
+class Solution_re:
+	def minWindow(self,s,t):
+		ans,left=inf,0
+		t_dic=Counter(t)
+		result_substr=''
+		for right,c in enumerate(s):
+			if c in t:
+				t_dic[c]-=1
+			while max(t_dic.values())<=0:
+				if ans>right-left+1:
+					ans=min(ans,right-left+1)
+					result_substr=s[left:right+1]
+				if s[left] in t:
+					t_dic[s[left]]+=1
+				left+=1
+		return result_substr
