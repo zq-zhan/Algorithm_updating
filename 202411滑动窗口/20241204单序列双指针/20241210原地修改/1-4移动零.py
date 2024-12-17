@@ -15,7 +15,7 @@ class Solution2:
 	def moveZeroes(self,nums):
 		k=0
 		for i in range(len(nums)):
-			if nums[i]!=0:
+			if nums[i]!=0:  #找到非零数与前面交换
 				temp_i=nums[i]
 				nums[i]=0
 				nums[k]=temp_i
