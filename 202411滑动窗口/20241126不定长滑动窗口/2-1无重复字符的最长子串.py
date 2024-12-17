@@ -23,10 +23,23 @@ class Solution2:
                 if len(set(string))==len(string):
                     ans=max(ans,len(set(string)))
         return ans
-                
+            
+# 不定长滑动窗口——求最长/最大
+## 20241202复习
+class Solution_rv:
+	def lengthOfLongestSubstring(self,s):
+		ans=left=0
+		dic_win=Counter()
+		for right,c in enumerate(s):
+			dic_win[c]+=1
+			while max(dic_win.values())>1:
+				dic_win[s[left]]-=1
+				left += 1
+			ans=max(ans,right-left+1)
+		return ans
                 
 
 if __name__=='__main__':
-	s="pwwkew"
-	cls=Solution2()
+	s="abcabcbb"
+	cls=Solution_rv()
 	print(cls.lengthOfLongestSubstring(s))

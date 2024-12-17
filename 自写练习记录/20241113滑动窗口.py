@@ -779,6 +779,359 @@ class Solution3:
                 ans = max(ans, right - left + 1)
         return ans
 
+# 毯子覆盖的最多白色砖块数
+class Solution1:
+	def maximumWhiteTiles(self,tiles,carpetlen):
+		tiles.sort(key=lambda x:x[1])
+		ans=left=0
+		cover=0
+		for tl,tr in tiles:
+			cover+=tr-tl+1
+			while tiles[left][1]<tr-carpetlen+1:
+				cover -= tiles[left][1]-tiles[left][0]+1
+				left += 1
+			uncover=max(tr-carpetlen+1-tiles[left][0],0)
+			ans=max(ans,cover-uncover)
+		return ans
+
+
+# 长度最小的子数组
+class Solution1:
+	def minSubArrayLen(self,target,nums):
+		ans=len(nums)
+		left=0
+		total=0
+		for right,c in enumerate(nums):
+			if total < target:
+				total += c
+				continue
+			ans=min(ans,right-left+1)
+			total -= nums[left]
+			left += 1
+		return ans
+# 灵神滑动窗口:while循环结束后更新答案
+class Solution2:
+	def minSubArrayLen(self,target,nums):
+		n=len(nums)
+		ans=n+1
+		s=left=0
+		for right,x in enumerate(nums): # 枚举子数组右端点
+			s += x
+			while s-nums[left] >= target:  #尽量缩短子数组长度
+				s -= nums[left]
+				left += 1
+			if s >= target:
+				ans=min(ans,right-left+1)
+		return ans if ans<=n else 0
+## 灵神滑动窗口：while循环内更新答案
+class Solution2:
+	def maxSubarrayLength(self,target,nums):
+		n=len(nums)
+		ans=n+1
+		s=left=0
+		for right,x in enumerate(nums):
+			s+=x
+			while s>=target:
+				ans=min(ans,right-left+1)
+				s-=nums[left]
+				left += 1
+		return ans if ans<n else 0
+
+
+class Solution:
+	def minSubArrayLen(self,target,nums):
+		n=len(nums)
+		ans=n+1
+		total=left=0
+		for right,x in enumerate(nums):
+			total+=x
+			while total>=target:
+				ans=min(ans,right-left+1)
+				total-=nums[left]
+				left+=1
+		return ans if ans<=n else 0
+
+
+# 最短且字典序最小的美丽子字符串
+class Solution1:
+	def shortestBeautifulSubstring(self,s,k):
+		n=len(s)
+		dic_win=Counter()
+		left=0
+		substr_lis=[]
+		len_result=n+1
+		for right,c in enumerate(s):
+			dic_win[c]+=1
+			while dic_win['1']==k:
+				substr_lis.append(s[left:right+1])
+				len_result=min(len_result,right-left+1)
+				dic_win[s[left]]-=1
+				left+=1
+		substr_lis.sort()
+		return substr_lis[0] if len_result<=n else ''
+
+# 方法二：
+class Solution2:
+	def shortestBeautifulSubstring(self,s,k):
+		if s.count('1')<k:
+			return ''
+		ans=s
+		cnt1=left=0
+		# bea_str=[]
+		for right,c in enumerate(s):
+			cnt1+=int(c)
+			while cnt1>=k or s[left]=='0':
+				if cnt1==k:
+					temp_str=s[left:right+1]
+					if len(temp_str)<len(ans) or (len(temp_str)=len(ans) and temp_str<ans):
+						ans=temp_str
+						# bea_str.append(temp_str)
+				cnt1-=int(s[left])
+				left+=1
+		bea_str.sort()
+		return bea_str[0]
+
+class Solution3:
+	def shortestBeautifulSubstring(self,s,k):
+		if s.count('1')<k:
+			return ''
+		ans=s
+		cnt1=left=0
+		# bea_str=[]
+		for right,c in enumerate(s):
+			cnt1+=int(c)
+			while cnt1==k:
+				# if cnt1==k:
+				temp_str=s[left:right+1]
+				if len(temp_str)<len(ans) or (len(temp_str)==len(ans) and temp_str<ans):
+					ans=temp_str
+					# bea_str.append(temp_str)
+				cnt1-=int(s[left])
+				left+=1
+		# bea_str.sort()
+		return ans
+
+
+# 替换子串得到平衡字符串
+## 方法一：自写版(错误)
+class Solution:
+	def balancedString(self,s):
+		ans=len(s)+1
+		left=0
+		target_num=len(s)/4
+		dic_all=Counter(s)
+		if len(dic_all)==4 and min(dic_all.values())==m:
+			return 0
+		for right,c in enumerate(s):
+			dic_all[c]-=1
+			while max(dic_all.values())<=target_num:
+				dic_all[s[left]]+=1
+				ans=min(ans,right-left+1)
+				left += 1
+		return ans 
+## 方法二：灵神不定长滑动窗口
+class Solution2:
+	def balancedString(self,s):
+		m=len(s)//4
+		cnt=Counter(s)
+		if len(cnt)==4 and min(cnt.values())==m:
+			return 0
+		ans,left=inf,0
+		for right,c in enumerate(s):
+			cnt[c]-=1
+			while max(cnt.values())<=m:
+				ans=min(ans,right-left+1)
+				cnt[nums[left]]+=1
+				left += 1
+		return ans
+## 方法三：滑动窗口内
+class Solution3:
+	def balancedString(self,s):
+		m=len(s)//4
+		dic_win=Counter()
+		dic_all=Counter(s)
+		left=0
+		for right,c in enumerate(s):
+			dic_win[c]+=1
+			while dic_all[c]-1<=target_num:
 
 
 
+# class Solution:
+# 	def minSubArrayLen(self,target,nums):
+# 		ans=len(s)+1
+# 		left=0
+# 		total=0
+# 		for right,c in enumerate(nums):
+# 			total+=c
+# 			while total>=target:
+# 				total-=nums[left]
+# 				ans=min(ans,right-left+1)
+# 				left+=1
+# 		return ans if ans<n else 0
+
+
+
+# 无限数组的最短子数组
+# 方法一：自写版，无法处理target较大的情况
+class Solution1:
+	def minSizeSubarray(self,nums,target):
+		ans,left=inf,0
+		total_win=0
+		n=len(nums)
+		win_len=0
+		new_nums=nums+nums
+		for right,c in enumerate(new_nums):
+			total_win+=new_nums[right]
+			win_len+=1
+			while total_win>=target:
+				if total_win==target:
+					ans=min(ans,win_len)
+				total_win-=new_nums[left]
+				win_len-=1
+				left+=1
+		return ans if ans!=inf else -1
+## 
+class Solution2:
+	def minSizeSubarray(self,nums,target):
+		ans,left=inf,0
+		total_win=0
+		n=len(nums)
+		win_len=0
+		new_nums=nums+nums
+		total=sum(nums)
+		for right,c in enumerate(new_nums):
+			total_win+=new_nums[right]
+			win_len+=1
+			while total_win>=target%total:
+				if total_win==target%total:
+					ans=min(ans,win_len)
+				total_win-=new_nums[left]
+				win_len-=1
+				left+=1
+		return ans+target//total*n if ans!=inf else -1
+
+
+## 方法二：灵神不定长滑动窗口
+class Solution2:
+	def minSizeSubarray(self,nums,target):
+		ans,left=inf,0
+		total_win=0
+		n=len(nums)
+		win_len=0
+		new_nums=nums+nums
+		total=sum(nums)
+		for right,c in enumerate(new_nums):
+			total_win+=new_nums[right]
+			win_len+=1
+			while total_win>target%total:
+				total_win-=new_nums[left]
+				win_len-=1
+				left+=1
+			if total_win==target%total:
+					ans=min(ans,win_len)
+		return ans+target//total*n if ans!=inf else -1
+
+
+# 最小覆盖子串
+## 方法一：自写版
+class Solution1:
+	def minWindow(self,s,t):
+		ans=inf
+		left=0
+		dic_win=Counter()
+		t_dic=Counter(t)
+		result_substr=''
+		for right,c in enumerate(s):
+			if c in t:
+				dic_win[c]+=1
+			while len(dic_win)==len(t_dic):
+				ans=min(ans,right-left+1)
+				result_substr=s[left:right+1]
+				if dic_win[s[left]]>0:
+					if dic_win[s[left]]==1:
+						del dic_win[s[left]]
+					else:
+						dic_win[s[left]]-=1
+				left+=1
+		return result_substr
+
+class Solution1:  # 不能解决窗口内字符数量的问题
+	def minWindow(self,s,t):
+		ans=inf
+		left=0
+		# dic_win=Counter()
+		t_dic=Counter(t)
+		temp_t_dic=Counter(t)
+		result_substr=''
+		for right,c in enumerate(s):
+			if c in t:
+				temp_t_dic[c]-=1
+			while len(temp_t_dic)==0:
+				if right-left+1<ans:
+					result_substr=s[left:right+1]
+					ans=min(ans,right-left+1)
+				if s[left] in t:
+					temp_t_dic[s[left]]+=1
+				left+=1
+		return result_substr
+
+## 灵神滑动窗口
+class Solution3:
+	def minWindow(self,s,t):
+		ans_left,ans_right=-1,len(s)
+		cnt=Counter(t)
+		less=len(cnt)
+		left=0
+		for right,c in enumerate(s):
+			cnt[c]-=1
+			if cnt[c]==0:
+				less-=1
+			while less==0:
+				if right-left-1<ans_right-ans_left-1:
+					ans_left,ans_right=left,right
+				x=s[left]
+				if cnt[x]==0:
+					less+=1
+				cnt[x]+=1
+				left+=1
+		return '' if ans_left<0 else s[ans_left:ans_right+1]
+
+class Solution1:
+	def minWindow(self,s,t):
+		ans=inf
+		left=0
+		dic_win=Counter()
+		t_dic=Counter(t)
+		result_substr=''
+		less=len(t_dic)
+		for right,c in enumerate(s):
+			dic_win[c]+=1
+			if dic_win[c]==t_dic[c]:
+				less-=1
+			while less==0:
+				if ans>right-left+1:
+					ans=min(ans,right-left+1)
+					result_substr=s[left:right+1]
+				if t_dic[s[left]]==dic_win[s[left]]:
+					less+=1
+				dic_win[s[left]]-=1
+				left+=1
+		return result_substr
+## 20241204思路
+class Solution_re:
+	def minWindow(self,s,t):
+		ans,left=inf,0
+		t_dic=Counter(t)
+		result_substr=''
+		for right,c in enumerate(s):
+			if c in t:
+				t_dic[c]-=1
+			while max(t_dic.values())<=0:
+				if ans>right-left+1:
+					ans=min(ans,right-left+1)
+					result_substr=s[left:right+1]
+				if s[left] in t:
+					t_dic[s[left]]+=1
+				left+=1
+		return result_substr
