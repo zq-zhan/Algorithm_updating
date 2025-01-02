@@ -172,5 +172,18 @@ class Solution:
         # 题目保证答案一定存在
         return nums2[0] - nums1[0]
 
+# 7.最长特殊序列
+class Solution1:
+	def findLUSlength(self,strs):
+		p1 = p2 = 0
+		while p1 < len(strs):
+			words = strs[p1]
+			while p2 < len(strs):
+				if p2 == p1:
+					p1 += 1
+					continue
+				
+
+
 
 
