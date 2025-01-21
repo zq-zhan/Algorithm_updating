@@ -1,4 +1,4 @@
-from collections import Counter
+from collections import Counter, defaultdict
 
 class Solution1():
 	def lengthOfLongestSubstring(self,s):
@@ -37,9 +37,22 @@ class Solution_rv:
 				left += 1
 			ans=max(ans,right-left+1)
 		return ans
-                
+
+# 1、无重复字符的最长子串
+class Solution5:
+	def lengthOfLongestSubstring(self, s):
+		ans = left = 0
+		dic_win = defaultdict(int)
+		for right, c in enumerate(s):
+			dic_win[c] += 1
+			if max(dic_win.values()) <= 1:
+				continue
+			ans = max(ans, len(dic_win))
+			dic_win[s[left]] -= 1
+			left += 1
+		return ans
 
 if __name__=='__main__':
 	s="abcabcbb"
-	cls=Solution_rv()
+	cls=Solution5()
 	print(cls.lengthOfLongestSubstring(s))

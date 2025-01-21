@@ -24,3 +24,21 @@ class Solution2:
 				left+=1
 			ans+=left
 		return ans
+	
+class Solution1:
+	def numberOfSubstrings(self, s, k):
+		ans = left = 0
+		dic_win = defaultdict(int)
+		for right, c in enumerate(s):
+			dic_win[c] += 1
+			while max(dic_win.values()) >= k:
+				dic_win[s[left]] -= 1
+				left += 1
+			ans += left
+		return ans
+
+if __name__ == '__main__':
+	s = "abacb"
+	k = 2
+	cls = Solution1()
+	print(cls.numberOfSubstrings(s, k))

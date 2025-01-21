@@ -74,9 +74,24 @@ class Solution_re:
 				left+=1
 		return ans if len(ans)<=len(s) else ''
 
+# 2.最短且字典序最小的美丽子字符传
+class Solution1:
+	def shortestBeautifulSubstring(self, s, k):
+		ans = s + '0'
+		left = 0
+		substr_cnt = 0
+		for right, c in enumerate(s):
+			substr_cnt += 1 if c == '1' else 0
+			while substr_cnt == k:
+				if len(ans) > right - left + 1 or (len(ans) == right - left + 1 and ans > s[left:right+1]):
+					ans = s[left:right + 1]
+				substr_cnt -= 1 if s[left] == '1' else 0
+				left += 1
+		return ans if len(ans) <= len(s) else ''
+	
 
 if __name__=='__main__':
 	s="11000111"
-	k=1
-	cls=Solution_re()
+	k=3
+	cls=Solution1()
 	print(cls.shortestBeautifulSubstring(s,k))
