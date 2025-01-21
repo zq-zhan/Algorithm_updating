@@ -38,9 +38,23 @@ class Solution4:
 			cnt-=1 if s[i-k+1] in "aeiou" else 0
 		return ans
 
+# 1.定长子串中元音的最大数目
+class Solution5:
+	def maxVowels(self, s, k):
+		left = ans = 0
+		# n = len(s)
+		temp = 0
+		for right, c in enumerate(s):
+			while right - left + 1 < k:
+				if s[right] in 'aeiou':
+					temp += 1
+				right += 1
+			ans = max(ans, temp)
+			temp -= 1 if s[left] in 'aeiou' else 0
+			left += 1
 
 
 s="abciiidef"
 k=3
-cls=Solution4()
+cls=Solution5()
 print(cls.maxVowels(s,k))

@@ -18,7 +18,20 @@ class Solution1:
 			ans+=left
 		return ans
 	
+class Solution1:
+	def countCompleteSubarrays(self, nums):
+		target_num = len(set(nums))
+		set_win = []
+		ans = left = 0
+		for right, c in enumerate(nums):
+			set_win.append(c)
+			while len(set(set_win)) == target_num:
+				set_win = set_win[1:]
+				left += 1
+			ans += left
+		return ans
+	
 if __name__=='__main__':
-	nums=[459,459,962,1579,1435,756,1872,1597]
+	nums=[1,3,1,2,2]
 	s=Solution1()
 	print(s.countCompleteSubarrays(nums))

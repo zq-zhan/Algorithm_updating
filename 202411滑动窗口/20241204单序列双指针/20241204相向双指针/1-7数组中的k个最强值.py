@@ -33,6 +33,23 @@ class Solution2:
 		return ans
 
 
+class Solution1:
+	def getStrongest(self, arr, k):
+		arr.sort()
+		n = len(arr)
+		med = arr[(n - 1) // 2]
+		left, right = 0, n - 1
+		ans = []
+		while len(ans) < k:
+			if abs(arr[right] - med) >= abs(arr[left] - med):
+				ans.append(arr[right])
+				right -= 1
+			else:
+				ans.append(arr[left])
+				left += 1
+		return ans
+	
+
 if __name__=='__main__':
 	arr=[6,7,11,7,6,8]
 	k=5

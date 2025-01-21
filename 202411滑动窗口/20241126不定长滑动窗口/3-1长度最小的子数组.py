@@ -26,9 +26,22 @@ class Solution2:
 				left += 1
 		return ans if ans<n else 0
 			
+# 1.长度最小的子数组
+class Solution5:
+	def minSubArrayLen(self, target, nums):
+		ans = len(nums) + 1
+		left = 0
+		sum_win = 0
+		for right, c in enumerate(nums):
+			sum_win += c
+			while sum_win >= target:
+				ans = min(ans, right - left + 1)
+				sum_win -= nums[left]
+				left += 1
+		return ans if ans <= len(nums) else 0
 
 if __name__ == '__main__':
 	nums=[2,3,1,2,4,3]
 	target=7
-	s=Solution2()
+	s=Solution5()
 	print(s.minSubArrayLen(target,nums))
