@@ -320,6 +320,10 @@ class Solution1:
 				ans = x
 		return ans
 
+# 20250122你可以获得的最大硬币数目
+class Solution1:
+	def maxCoins(self, piles):
+		
 
 
 
