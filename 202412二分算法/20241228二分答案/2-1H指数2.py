@@ -43,7 +43,20 @@ class Solution2:
 				right = mid
 		return left
 
+
+class Solution3:
+	def hIndex(self, citations):
+		left, right = 0, len(citations) + 1
+		while left + 1 < right:
+			mid = (left + right) // 2
+			if sum(x // mid >= 1 for x in citations) >= mid:
+				left = mid
+			else:
+				right = mid
+		return left
+
+	
 if __name__ == '__main__':
-	citations = [0]
-	cls = Solution()
+	citations = [100]
+	cls = Solution3()
 	print(cls.hIndex(citations))

@@ -47,9 +47,34 @@ class Solution2:
             total = 0
             cnt += 1
         return cnt - 1 <= d
+	
+class Solution3:
+	def shipWithinDays(self, weights, days):
+		def check(nums, target, days):
+			ans = temp_sum = 0
+			for x in nums:
+				if temp_sum + x <= target:
+					temp_sum += x
+				else:
+					ans += 1
+					temp_sum = x
+			if temp_sum <= target:
+				ans += 1
+			return ans <= days
+
+
+		left, right = max(weights) - 1, sum(weights)
+		while left + 1 < right:
+			mid = (left + right) // 2
+			if check(weights, mid, days):
+				right = mid
+			else:
+				left = mid
+		return right
+
 
 if __name__ == '__main__':
 	weights = [1,2,3,1,1]
 	days = 4
-	s = Solution1()
+	s = Solution3()
 	print(s.shipWithinDays(weights, days))

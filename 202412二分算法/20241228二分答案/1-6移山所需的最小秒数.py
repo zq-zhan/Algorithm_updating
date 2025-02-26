@@ -1,5 +1,6 @@
 # 6.移山所需的最小秒数
 from math import sqrt
+import heapq
 
 
 class Solution1:
@@ -36,6 +37,9 @@ class Solution1:
 		return right
 
 
+
+
+
 class Solution2:
 
 	def check(self, mountainHeight, workerTimes, mid):
@@ -70,8 +74,41 @@ class Solution2:
 				left = mid
 		return right
 
+
+# 13.移山所需的最少秒数
+class Solution3:
+	def minNumberOfSeconds(self, mountainHeight, workerTimes):
+		def check(mid, workerTimes, mountainHeight):
+			ans = 0
+			for x in workerTimes:
+				ans += (sqrt(1 + 8 * mid // x) - 1) // 2
+			return ans >= mountainHeight
+
+
+		left, right = 0, max(workerTimes) * (mountainHeight + 1) * mountainHeight // 2 + 1
+		while left + 1 < right:
+			mid = (left + right) // 2
+			if check(mid, workerTimes, mountainHeight):
+				right = mid
+			else:
+				left = mid
+		return right
+	
+## 灵神方法二：最小堆模拟
+## 灵神方法二：最小堆模拟
+class Solution4:
+	def minNumberOfSeconds(self, mountainHeight, workerTimes):
+		h = [(t, t, t) for t in workerTimes]
+		heapq.heapify(h)
+		for _ in range(mountainHeight):
+			nxt, delta, base = h[0]
+			heapq.heapreplace(h, (nxt + delta + base, delta + base, base))
+		return nxt
+
+
+
 if __name__ == '__main__':
 	mountainHeight = 4
 	workerTimes = [2,1,1]
-	cls = Solution2()
+	cls = Solution4()
 	print(cls.minNumberOfSeconds(mountainHeight, workerTimes))

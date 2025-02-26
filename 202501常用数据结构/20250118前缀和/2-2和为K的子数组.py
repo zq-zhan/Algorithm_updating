@@ -29,8 +29,21 @@ class Solution2:
 			ans += cnt[sj - k]  # 统计在j左边（即出现在已遍历的前缀和中）使得s[j] - s[i] = k 即和为k的子数组个数
 			cnt[sj] += 1  # 更新前缀和出现的次数
 		return ans
+	
+## 灵神题解——方法二：一次遍历
+class Solution3:
+	def subarraySum(self, nums, k):
+		ans = pre_sum = 0
+		cnt = defaultdict(int)
+		cnt[0] = 1
+		for i, c in enumerate(nums):
+			pre_sum += c
+			ans += cnt[pre_sum - k]
+			cnt[pre_sum] += 1
+		return ans
+
 
 if __name__ == '__main__':
 	nums = [-1, -1, 1]
-	k = -2
-	print(Solution2().subarraySum(nums, k))
+	k = 1
+	print(Solution3().subarraySum(nums, k))

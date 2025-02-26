@@ -8,7 +8,7 @@ class Solution1:
 				right = mid
 			else:
 				left = mid
-		if right == sum(dist):
+		if right >= max(dist):
 			return -1
 		return right
 	
@@ -39,8 +39,19 @@ class Solution2:
 				left = mid
 		return right
 	
+class Solution3:
+	def minSpeedOnTime(self, dist, hours):
+		left, right = 0, sum(dist)
+		while left + 1 < right:
+			mid = (left + right) // 2
+			if sum((x - 1) // mid + 1 for x in dist) <= hour:
+				right = mid
+			else:
+				left = mid
+		return right
+
 if __name__ == '__main__':
-	dist = [1,1,100000]
-	hour = 2.01
-	cls = Solution2()
+	dist = [1,3,2]
+	hour = 2.7
+	cls = Solution1()
 	print(cls.minSpeedOnTime(dist, hour))
