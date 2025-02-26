@@ -26,9 +26,20 @@ class Solution2:
 				left = mid
 		return right
 
+# 8.使结果不超过阈值的最小除数
+class Solution3:
+	def smallestDivisor(self, nums, threshold):
+		left, right = 0, max(nums) + 1
+		while left + 1 < right:
+			mid = (left + right) // 2
+			if sum((x - 1) // mid + 1 for x in nums) <= threshold:
+				right = mid
+			else:
+				left = mid
+		return right
 			
 if __name__ == '__main__':
 	nums = [44,22,33,11,1]
 	threshold = 5
-	s = Solution2()
+	s = Solution3()
 	print(s.smallestDivisor(nums, threshold))

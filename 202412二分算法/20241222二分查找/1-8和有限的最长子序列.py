@@ -1,5 +1,5 @@
 # 8.和有限的最长子序列
-from bisect import bisect_left
+from bisect import bisect_left,bisect_right
 
 
 class Solution1:
@@ -43,9 +43,22 @@ class Solution2:
 			else:
 				ans.append(find + 1)
 		return ans
+	
+class Solution3:
+	def answerQueries(self, nums, queries):
+		nums.sort()
+		new_nums = [nums[0]]
+		for i in range(1, len(nums)):
+			new_nums.append(new_nums[-1] + nums[i])
+
+		ans = []
+		for x in queries:
+			ans.append(bisect_right(new_nums, x))
+		return ans
+
 
 if __name__ == '__main__':
 	nums = [2,3,4,5]
 	queries = [1]
-	cls = Solution2()
+	cls = Solution3()
 	print(cls.answerQueries(nums,queries))
