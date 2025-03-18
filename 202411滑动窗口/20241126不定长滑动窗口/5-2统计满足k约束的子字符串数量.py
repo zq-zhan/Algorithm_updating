@@ -2,7 +2,7 @@
 from collections import defaultdict
 
 
-class Solution1:
+class Solution1: 
 	def countKConstraintSubstrings(self,s,k):
 		ans=left=0
 		dic_win={'0':0,'1':0}
@@ -14,7 +14,7 @@ class Solution1:
 			ans+=right-left+1
 		return ans
 
-class Solution1:
+class Solution3:  # 错解
 	def countKConstraintSubstrings(self, s, k):
 		ans = left = 0
 		dic_win = defaultdict(int)
@@ -26,7 +26,19 @@ class Solution1:
 			ans += right - left + 1
 		return ans
 
+class Solution4:
+	def countKConstraintSubstrings(self, s, k):
+		dic_win = {'1':0,'0':0}
+		ans = left = 0
+		for right, c in enumerate(s):
+			dic_win[c] += 1
+			while min(dic_win.values()) > k:
+				dic_win[s[left]] -= 1
+				left += 1
+			ans += right - left + 1
+		return ans
+	
 if __name__=='__main__':
 	s="11111"
 	k=1
-	print(Solution1().countKConstraintSubstrings(s,k))
+	print(Solution4().countKConstraintSubstrings(s,k))

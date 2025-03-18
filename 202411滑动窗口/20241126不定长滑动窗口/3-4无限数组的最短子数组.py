@@ -110,9 +110,28 @@ class Solution2:
 				left += 1
 		return ans + target // total * n if ans < inf else -1
 
+class Solution3:
+	def minSizeSubarray(self, nums, target):
+		n = len(nums)
+		times = target // sum(nums)
+		target = target - times * sum(nums)
+		if target == 0:
+			return times * n
+		nums = nums + nums
+		ans = n
+		left = 0
+
+		for right, c in enumerate(nums):
+			target -= c
+			while target <= 0:
+				if target == 0:
+					ans = min(ans, right - left + 1)
+				target += nums[left]
+				left += 1
+		return ans + times * n if ans < n else -1
 
 if __name__=='__main__':
 	nums=[1,1,1,2,3]
 	target=10
-	cls=Solution2()
+	cls=Solution3()
 	print(cls.minSizeSubarray(nums,target))

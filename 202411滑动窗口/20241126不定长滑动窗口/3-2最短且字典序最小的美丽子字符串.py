@@ -88,10 +88,49 @@ class Solution1:
 				substr_cnt -= 1 if s[left] == '1' else 0
 				left += 1
 		return ans if len(ans) <= len(s) else ''
-	
+
+class Solution4:
+	def shortestBeautifulSubstring(self, s, k):
+		ans = s + '0'
+		left = 0
+		temp_sum = 0
+		# temp_substr = ''
+		for right, c in enumerate(s):
+			temp_sum += 1 if c == '1' else 0
+			# temp_substr += c
+			while temp_sum == k:
+				temp_len = right - left + 1
+				temp_substr = s[left : right + 1]
+				if temp_len < len(ans) or (temp_len == len(ans) and temp_substr < ans):
+					ans = s[left : right + 1]
+				temp_sum -= 1 if s[left] == '1' else 0
+				left += 1
+		return ans if len(ans) <= len(s) else ''
+
+## 优化
+class Solution5:
+	def shortestBeautifulSubstring(self, s, k):
+		if s.count('1') < k:
+			return ''
+
+		ans = s
+		left = 0
+		temp_cnt = 0
+		for right, c in enumerate(s):
+			temp_cnt += int(c)
+			while s[left] == '0':
+				left += 1
+			if temp_cnt == k:
+				temp_str = s[left : right + 1]
+				if len(temp_str) < len(ans) or (len(temp_str) == len(ans) and temp_str < ans):
+					ans = temp_str
+				temp_cnt -= int(c)
+				# left += 1
+		return ans
+
 
 if __name__=='__main__':
-	s="11000111"
-	k=3
-	cls=Solution1()
+	s="111011110"
+	k=1
+	cls=Solution5()
 	print(cls.shortestBeautifulSubstring(s,k))

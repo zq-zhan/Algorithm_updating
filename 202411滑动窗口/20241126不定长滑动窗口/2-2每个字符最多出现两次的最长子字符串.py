@@ -28,9 +28,20 @@ class Solution_rv:
 			ans=max(ans,right-left+1)
 		return ans
 	
-
+class Solution3:
+	def maximumLengthSubstring(self, s):
+		dic_win = defaultdict(int)
+		ans = 0
+		left = 0
+		for right, c in enumerate(s):
+			dic_win[c] += 1
+			while max(dic_win.values()) > 2:
+				dic_win[s[left]] -= 1
+				left += 1
+			ans = max(ans, right - left + 1)
+		return ans
 
 if __name__=='__main__':
 	s="bcbbbcba"
-	cls=Solution1()
+	cls=Solution3()
 	print(cls.maximumLengthSubstring(s))

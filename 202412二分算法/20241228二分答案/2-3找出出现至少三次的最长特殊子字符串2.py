@@ -69,5 +69,5 @@ class Solution3:
 
 if __name__ == '__main__':
 	s = "ereerrrererrrererre"
-	cls = Solution3()
+	cls = Solution2()
 	print(cls.maximumLength(s))

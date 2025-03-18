@@ -43,9 +43,22 @@ class Solution1:
 				left += 1
 			ans += left
 		return ans
+	
+class Solution3:
+	def countSubarrays(self, nums, k):
+		max_num = max(nums)
+		cnt_win = 0
+		ans, left = 0, 0
+		for right, c in enumerate(nums):
+			cnt_win += 1 if c == max_num else 0
+			while cnt_win >= k:
+				cnt_win -= 1 if nums[left] == max_num else 0
+				left += 1
+			ans += left
+		return ans
 
 if __name__ == '__main__':
 	nums=[1,3,2,3,3]
 	k=2
-	cls=Solution1()
+	cls=Solution3()
 	print(cls.countSubarrays(nums,k))

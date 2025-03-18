@@ -52,7 +52,22 @@ class Solution5:
 			left += 1
 		return ans
 
+class Solution6:
+	def lengthOfLongestSubstring(self, s):
+		temp_win = set()
+		left, right = 0, 0
+		n = len(s)
+		ans = 0
+		while right < n:
+			while left <= right and s[right] in temp_win:
+				temp_win.remove(s[left])
+				left += 1
+			temp_win.add(s[right])
+			ans = max(ans, right - left + 1)
+			right += 1
+		return ans
+
 if __name__=='__main__':
 	s="abcabcbb"
-	cls=Solution5()
+	cls=Solution6()
 	print(cls.lengthOfLongestSubstring(s))

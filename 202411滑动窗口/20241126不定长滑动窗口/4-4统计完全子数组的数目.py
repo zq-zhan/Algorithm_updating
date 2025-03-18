@@ -1,4 +1,4 @@
-from collections import Counter
+from collections import Counter, defaultdict
 
 ## 统计完全子数组的数目
 class Solution1:
@@ -31,7 +31,23 @@ class Solution1:
 			ans += left
 		return ans
 	
+class Solution3:  # 空间换时间
+	def countCompleteSubarrays(self, nums):
+		target = len(set(nums))
+		dic_win = defaultdict(int)
+		ans, left = 0, 0
+		for right, c in enumerate(nums):
+			dic_win[c] += 1
+			while len(dic_win) == target:
+				if dic_win[nums[left]] == 1:
+					del dic_win[nums[left]]
+				else:
+					dic_win[nums[left]] -= 1
+				left += 1
+			ans += left
+		return ans
+	
 if __name__=='__main__':
 	nums=[1,3,1,2,2]
-	s=Solution1()
+	s=Solution3()
 	print(s.countCompleteSubarrays(nums))

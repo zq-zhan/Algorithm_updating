@@ -36,9 +36,22 @@ class Solution2:
 			ans+=left
 		return ans
 
+class Solution3:
+	def validSubstringCount(self, word1, word2):
+		word2_dic = Counter(word2)
+		ans = left = 0
+		for right, c in enumerate(word1):
+			if c in word2:
+				word2_dic[c] -= 1
+			while max(word2_dic.values()) <= 0:
+				if word1[left] in word2:
+					word2_dic[word1[left]] += 1
+				left += 1
+			ans += left
+		return ans
 
 if __name__ == '__main__':
 	word1="bcca"
 	word2="abc"
-	cls=Solution2()
+	cls=Solution3()
 	print(cls.validSubstringCount(word1,word2))

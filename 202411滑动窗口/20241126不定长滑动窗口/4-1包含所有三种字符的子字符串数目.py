@@ -1,4 +1,6 @@
 # 越长越合法
+from collections import defaultdict
+
 # 1.包含所有三种字符的子字符串数目
 class Solution1:
 	def numberOfSubstrings(self, s):
@@ -26,8 +28,24 @@ class Solution2:
 			ans += left
 		return ans
 
+## 
+class Solution3:
+	def numberOfSubstrings(self, s):
+		dic_win = defaultdict(int)
+		ans, left = 0, 0
+		for right, c in enumerate(s):
+			dic_win[c] += 1
+			while len(dic_win) == 3:
+				ans += left + 1
+				if dic_win[s[left]] == 1:
+					del dic_win[s[left]]
+				else:
+					dic_win[s[left]] -= 1
+				left += 1
+			# ans += left
+		return ans
 	
 if __name__ == '__main__':
-	s = "abcabc"
-	cls = Solution2()
+	s = "aaacb"
+	cls = Solution3()
 	print(cls.numberOfSubstrings(s))
