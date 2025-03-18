@@ -53,8 +53,19 @@ class Solution5:
 			temp -= 1 if s[left] in 'aeiou' else 0
 			left += 1
 
+class Solution6:
+	def maxVowels(self, s, k):
+		ans = 0
+		temp_ans = 0
+		s = list(s)
+		for left, x in enumerate(s):
+			temp_ans += 1 if x in 'aeiou' else 0
+			if left >= k - 1:
+				ans = max(ans, temp_ans)
+				temp_ans -= 1 if s[left - k + 1] in 'aeiou' else 0
+		return ans
 
 s="abciiidef"
 k=3
-cls=Solution5()
+cls=Solution1()
 print(cls.maxVowels(s,k))

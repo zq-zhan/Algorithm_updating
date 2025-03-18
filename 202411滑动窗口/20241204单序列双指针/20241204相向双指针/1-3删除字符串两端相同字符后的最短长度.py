@@ -17,7 +17,6 @@ class Solution1:
 ## 思路二：
 class Solution2:
 	def minimumLength(self,s):
-		n=len(s)
 		left,right=0,len(s)-1
 		while left<right and s[left]==s[right]:
 			c=s[left]
@@ -26,6 +25,7 @@ class Solution2:
 			while right>=left and s[right]==c:
 				right-=1
 		return right-left+1
+
 
 
 if __name__ == "__main__":

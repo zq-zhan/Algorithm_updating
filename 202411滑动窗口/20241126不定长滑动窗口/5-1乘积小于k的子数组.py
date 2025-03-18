@@ -27,9 +27,22 @@ class Solution2:
 			ans += right - left + 1
 		return ans
 
+class Solution3:
+	def numSubarrayProductLessThanK(self, nums, k):
+		if k <= 1:
+			return 0
+		ans = left = 0
+		plus_win = 1
+		for right, c in enumerate(nums):
+			plus_win *= c
+			while plus_win >= k:
+				plus_win /= nums[left]
+				left += 1
+			ans += right - left + 1
+		return ans
 
 if __name__ == '__main__':
-	nums=[10,5,2,6]
-	k=100
-	s=Solution2()
+	nums=[1,1,1]
+	k=1
+	s=Solution3()
 	print(s.numSubarrayProductLessThanK(nums,k))

@@ -307,7 +307,20 @@ class Solution1:
 				right = mid
 		return left
 
+# 16.找出出现至少三次的最长特殊子字符串
+class Solution1:
+	def maximumLength(self, s):
+		def check(mid, s):
+			ans = 0
+			s = list(s)
+			for i, c in enumerate(s):
+				if s[i] == s[i + 1]:
+					continue
+				else:
 
+		left, right = 0, len(s)
+		while left + 1 < right:
+			mid = (left + right) // 2
 
 
 

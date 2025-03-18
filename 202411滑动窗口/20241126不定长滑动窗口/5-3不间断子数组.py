@@ -1,4 +1,4 @@
-from collections import Counter
+from collections import Counter, defaultdict
 
 ## 不间断子数组
 class Solution1:
@@ -28,6 +28,21 @@ class Solution2:
 			ans+=right-left+1
 		return ans
 
+class Solution3:
+	def continuousSubarrays(self, nums):
+		ans = left = 0
+		temp_win = defaultdict(int)
+		for right, c in enumerate(nums):
+			temp_win[c] += 1
+			while max(temp_win) - min(temp_win) > 2:
+				if temp_win[nums[left]] == 1:
+					del temp_win[nums[left]]
+				else:
+					temp_win[nums[left]] -= 1
+				left += 1
+			ans += right - left + 1
+		return ans
+
 if __name__ == '__main__':
 	nums=[5,4,2,4]
-	print(Solution2().continuousSubarrays(nums))
+	print(Solution3().continuousSubarrays(nums))
