@@ -49,7 +49,20 @@ class Solution4:
 		ans = max(nums[0] + rob_normal(nums[2:-1]), rob_normal(nums[1:]))
 		return ans
 
+class Solution5:
+	def rob(self, nums):
+		def rob_w(arr):
+			n = len(arr)
+			@cache
+			def dfs(i):
+				if i < 0:
+					return 0
+				return max(dfs(i - 1), dfs(i - 2) + arr[i])
+			return dfs(n - 1)
+		return max(nums[-1] + rob_w(nums[1:-2]), rob_w(nums[:-1]))
+
+
 if __name__ == '__main__':
 	nums = [2, 3, 2]
-	print(Solution4().rob(nums))
+	print(Solution5().rob(nums))
 	# print(Solution2().rob(nums))

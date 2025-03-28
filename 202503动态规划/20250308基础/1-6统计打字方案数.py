@@ -29,6 +29,7 @@ class Solution1:
 			
 		return ans % mod
 	
+
 ## 递推
 class Solution2:
 	def countTexts(self, pressedKeys):
@@ -53,7 +54,34 @@ class Solution2:
 					f[i] = sum(f[i - j] for j in range(1, 4) if i >= j) % mod
 			ans = (ans * f[-1]) % mod
 		return ans % mod
+	
+class Solution3:
+	def countTexts(self, pressedKeys):
+		mod = 10 ** 9 + 7
+		press_lis = []
+		left = 0
+		n = len(pressedKeys)
+		for right in range(n - 1):
+			if pressedKeys[right] == pressedKeys[right + 1]:
+				continue
+			press_lis.append([pressedKeys[left], right - left + 1])
+			left = right + 1
+		press_lis.append([pressedKeys[left], n - left])
+		@cache
+		def dfs(i, x):
+			if i < 0:
+				return 0
+			elif i <= 1:
+				return 1
+			return sum(dfs(i - y, x) for y in range(1, x + 1)) % mod
+		ans = 1
+		for x, cnt in press_lis:
+			if x in ['7','9']:
+				ans = ans * dfs(cnt, 4) % mod
+			else:
+				ans = ans * dfs(cnt, 3) % mod
+		return ans
 
 if __name__ == '__main__':
 	pressedKeys = '22233'
-	print(Solution2().countTexts(pressedKeys))
+	print(Solution3().countTexts(pressedKeys))

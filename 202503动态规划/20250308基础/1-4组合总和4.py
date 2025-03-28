@@ -41,8 +41,27 @@ class Solution3:
 			f1 = new_f
 		return f1
 	
+class Solution4:  # 错解：顺序不同为相同1
+	def combinationSum4(self, nums, target):
+		@cache
+		def dfs(i, c):
+			if c == 0:
+				return 1
+			return dfs(i - 1, c) + dfs(i, c - nums[i])
+		return dfs(len(nums) - 1, target)
+	
+## 灵神题解
+class Solution5:
+	def combinationSum4(self, nums, target):
+		@cache
+		def dfs(i):
+			if i == 0:
+				return 1
+			return sum(dfs(i - x) for x in nums if x <= i)
+		return dfs(target)
+	
 if __name__ == '__main__':
 	nums = [1, 2, 3]
 	target = 4
-	s = Solution3()
+	s = Solution5()
 	print(s.combinationSum4(nums, target))

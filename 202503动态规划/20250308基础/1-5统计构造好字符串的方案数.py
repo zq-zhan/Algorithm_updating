@@ -28,6 +28,19 @@ class Solution2:
 			ans += f[-1]
 		return ans % (10 ** 9 + 7)
 	
+
+class Solution3:
+	def countGoodStrings(self, low, high, zero, one):
+		mod = (10 ** 9) + 7
+		@cache
+		def dfs(i):
+			if i == 0:
+				return 1
+			elif i < 0:
+				return 0
+			return (dfs(i - zero) + dfs(i - one)) % mod
+		return sum(dfs(x) for x in range(high, low - 1, -1)) % mod
+
 if __name__ == '__main__':
-	s = Solution1()
+	s = Solution3()
 	print(s.countGoodStrings(3, 3, 1, 1))
