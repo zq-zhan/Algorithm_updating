@@ -41,7 +41,21 @@ class Solution3:
 			f1 = new_f
 		return f1
 	
+class Solution4:
+	def deleteAndEarn(self, nums):
+		n = max(nums) + 1
+		a = [0] * n
+		for x in nums:
+			a[x] += x
+		@cache
+		def dfs(i):
+			if i < 0:
+				return 0
+			return max(dfs(i - 1), dfs(i - 2) + a[i])
+		return dfs(n - 1)
+
+
 if __name__ == '__main__':
-	s = Solution3()
+	s = Solution4()
 	nums = [3, 4, 2]
 	print(s.deleteAndEarn(nums)) # Output: 6

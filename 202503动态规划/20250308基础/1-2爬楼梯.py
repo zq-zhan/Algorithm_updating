@@ -28,8 +28,27 @@ class Solution3:
 			f0 = f1
 			f1 = new_f
 		return new_f
+	
+class Solution4:
+	def climbStairs(self, n):
+		@cache
+		def dfs(i):
+			if i <= 1:
+				return 1
+			return dfs(i - 1) + dfs(i - 2)
+		return dfs(n)
+## 递推优化
+class Solution5:
+	def climbStairs(self, n):
+		f0 = 1 
+		f1 = 1
+		for i in range(2, n + 1):
+			new_f = f0 + f1
+			f0 = f1
+			f1 = new_f
+		return f1
 		
 
 if __name__ == '__main__':
 	n = 4
-	print(Solution3().climbStairs(n)) # Output: 2
+	print(Solution5().climbStairs(n)) # Output: 2

@@ -810,12 +810,365 @@ class Solution1:
 # 1.和为目标值的最长子序列长度
 class Solution1:
 	def lengthOfLongestSubsequence(self, nums, target):
+		n = len(nums)
+		@cache
+		def dfs(i, c):
+			if i < 0:
+				return 0 if c == 0 else - inf
+			if nums[i] > c:
+				return dfs(i - 1, c)
+			return max(dfs(i - 1, c), dfs(i - 1, c - nums[i]) + 1)
+		ans = dfs(n - 1, target)
+		dfs.cache_clear()
+		return ans if ans > -1 else -1
+## 递推写法
+class Solution2:
+	def lengthOfLongestSubsequence(self, nums, target):
+		n = len(nums)
+		f = [[-inf] * (target + 1) for _ in range(n + 1)]
+		f[0][0] = 0
+		for i, x in enumerate(nums):
+			for c in range(target + 1):
+				if x > c:
+					f[i + 1][c] = f[i][c]
+				else:
+					f[i + 1][c] = max(f[i][c], f[i][c - x] + 1)
+		ans = f[n][target]
+		return ans if ans > -1 else -1
+## 滚动数组
+class Solution3:
+	def lengthOfLongestSubsequence(self, nums, target):
+		n = len(nums)
+		f = [[-inf] * (target + 1) for _ in range(2)]
+		f[0][0] = 0
+		for i, x in enumerate(nums):
+			for c in range(target + 1):
+				if x > c:
+					f[(i + 1)%2][c] = f[i%2][c]
+				else:
+					f[(i + 1)%2][c] = max(f[i%2][c], f[i%2][c - x] + 1)
+		ans = f[n%2][target]
+		return ans if ans > -1 else -1
+## 优化空间复杂度为一维的数组
+class Solution3:
+	def lengthOfLongestSubsequence(self, nums, target):
+		n = len(nums)
+		f = [-inf] * (target + 1)
+		f[0] = 0
+		for x in nums:
+			for c in range(target, x - 1, -1):
+				if f[c] < f[c - x] + 1:
+					f[c] = f[c - x] + 1
+		ans = f[target]
+		return ans if ans > -1 else -1
+
+# 2.分割等和子集
+class Solution1:
+	def canPartition(self, nums):
+		n = len(nums)
+		if sum(nums) % 2:
+			return False
+		target = sum(nums) // 2
+		def dfs(i, c):
+			if i < 0:
+				return 1 if c == 0 else 0
+			if nums[i] > c:
+				return dfs(i - 1, c)
+			return max(dfs(i - 1, c), dfs(i - 1, c - nums[i]))
+		ans = dfs(n - 1, target)
+		return True if ans == 1 else False
+## 优化
+class Solution1:
+	def canPartition(self, nums):
+		@cache
+		def dfs(i, c):
+			if i < 0:
+				return c == 0
+			return (c >= nums[i] and dfs(i - 1, c - nums[i])) or dfs(i - 1, c)
+		s = sum(nums)
+		return s % 2 == 0 and dfs(len(nums) - 1, s // 2)
+## 递推写法
+class Solution2:
+	def canPartition(self, nums):
+		n = len(nums)
+		s = sum(nums)
+		if s % 2:
+			return False
+		target = s // 2
+		f = [[False] * (target + 1) for _ in range(n + 1)]
+		f[0][0] = True
+		for i, x in enumerate(nums):
+			for c in range(target + 1):
+				f[i + 1][c] = c >= x and f[i][c - x] or f[i][c]
+				# if x > c:
+				# 	f[i + 1][c] = f[i][c]
+				# else:
+				# 	f[i + 1][c] = f[i][c] or f[i][c - x]
+		return f[n][target]
+## 滚动数组
+class Solution3:
+	def canPartition(self, nums):
+		n = len(nums)
+		s = sum(nums)
+		if s % 2:
+			return False
+		target = s // 2
+		f = [[False] * (target + 1) for _ in range(2)]
+		f[0][0] = True
+		for i, x in enumerate(nums):
+			for c in range(target + 1):
+				f[(i + 1) % 2][c] = c >= x and f[i % 2][c - x] or f[i % 2][c]
+		return f[n % 2][target]
+
+# 3.目标和
+class Solution1:
+	def findTargetSumWays(self, nums, target):
+		n = len(nums)
+		s = sum(nums)
+		target = (s - abs(target))
+		if target < 0 or target % 2:
+			return 0
+		target = target // 2
+		@cache
+		def dfs(i, c):
+			if i < 0:
+				return 1 if c == 0 else 0
+			return dfs(i - 1, c) + dfs(i - 1, c - nums[i])
+		return dfs(n - 1, target)
+## 递推
+class Solution2:
+	def findTargetSumWays(self, nums, target):
+		n = len(nums)
+		s = sum(nums)
+		target = (s - abs(target))
+		if target < 0 or target % 2:
+			return 0
+		target = target // 2
+		f = [[0] * (target + 1) for _ in range(n + 1)]
+		f[0][0] = 1
+		for i, x in enumerate(nums):
+			for c in range(target + 1):
+				if c >= x:
+					f[i + 1][c] = f[i][c] + f[i][c - x]
+				else:
+					f[i + 1][c] = f[i][c]
+		return f[n][target]
+
+# 4.把一个数字表示成幂的和的方案数
+class Solution1:
+	def numberOfWays(self, n, x):
+		mod = (10 ** 9) + 7
+		# target = int(math.pow(n, 1/x)) + 1
+		nums = [num for num in range(1, n + 1)]
+		@cache
+		def dfs(i, c):
+			if i < 0 or c < 0:
+				return 1 if c == 0 else 0
+			return (dfs(i - 1, c) + dfs(i - 1, c - nums[i] ** x)) % mod
+		return dfs(n - 1, n) % mod
+
+# 5.执行操作可获得的最大总奖励
+class Solution1:  # 错解
+	def maxTotalReward(self, rewardValues):
+		rewardValues.sort(by = False)
+		ans = 0
+		@cache
+		def dfs(i, c):
+			nonlocal ans
+			if i < 0:
+				ans = max(ans, c)
+				return ans
+			if rewardValues[i] > c:
+				return max(dfs(i - 1, c + rewardValues[i]), dfs(i - 1, c))
+			else:
+				return dfs(i - 1, c)
 		
+		return dfs(len(rewardValues) - 1, 0)
+## 灵神思路
+class Solution2:
+	def maxTotalReward(self, rewardValues):
+		nums = sorted(set(rewardValues))
+		m = nums[-1]  # 最大值
+		f = [False] * 2 * m
+		f[0] = True
+		for v in nums:
+			for c in range(2 * m):
+				if v <= c < 2 * v:
+					f[c] = f[c] | f[c - v]
+		ans = 2 * m - 1
+		while not f[ans]:
+			ans -= 1
+		return ans
+## 递归写法
+class Solution3:
+	def maxTotalReward(self, rewardValues):
+		nums = sorted(set(rewardValues))
+		m = nums[-1]
+		@cache
+		def dfs(i, c):
+			if i < 0:
+				return True if c == 0 else False
+			if nums[i] <= c < 2 * nums[i]:
+				return dfs(i - 1, c) or dfs(i - 1, c - nums[i])
+			else:
+				return dfs(i - 1, c)
+		ans = 2 * m - 1
+		n = len(nums)
+		while not dfs(n - 1, ans):
+			ans -= 1
+		return ans
 
+# 6.一和零
+class Solution1:  # 超出内存
+	def findMaxForm(self, strs, m, n):
+		cnt_0 = [s.count('0') for s in strs]
+		@cache
+		def dfs(i, m, n):
+			if i < 0:
+				return 0 if m >= 0 and n >= 0 else -inf
+			x = cnt[i]
+			y = len(strs[i]) - x
+			return max(dfs(i - 1, m - x, n - y) + 1, dfs(i - 1, m, n))
+		return dfs(len(strs) - 1, m, n)
+##
+class Solution2: 
+	def findMaxForm(self, strs, m, n):
+		cnt_0 = [s.count('0') for s in strs]
+		@cache
+		def dfs(i, m, n):
+			if i < 0:
+				return 0
+			x = cnt[i]
+			y = len(strs[i]) - x
+			if m >= x and n >= y:
+				return max(dfs(i - 1, m - x, n - y) + 1, dfs(i - 1, m, n))
+			else:
+				return dfs(i - 1, m, n)
+		return dfs(len(strs) - 1, m, n)
 
+#################### 完全背包
+# 1.零钱兑换
+class Solution1:
+	def coinChange(self, coins, amount):
+		@cache
+		def dfs(i, c):
+			if i < 0:
+				return 0 if c == 0 else inf
+			if c < coins[i]:
+				return dfs(i - 1, c)
+			return min(dfs(i - 1, c), dfs(i, c - coins[i]) + 1)
+		ans = dfs(len(coins) - 1, amount)
+		return ans if ans < inf else -1
+## 递推写法
+class Solution2:
+	def coinChange(self, coins, amount):
+		n = len(coins)
+		f = [[inf] * (amount + 1) for _ in range(n + 1)]
+		f[0][0] = 0
+		for i, x in enumerate(coins):
+			for c in range(amount + 1):
+				if c >= x:
+					f[i + 1][c] = min(f[i][c], f[i + 1][c - x] + 1)
+				else:
+					f[i + 1][c] = f[i][c]
+		ans = f[n][amount] 
+		return ans if ans < inf else -1
+## 优化为一维
+class Solution3:
+	def coinChange(self, coins, amount):
+		n = len(coins)
+		f = [0] + [inf] * amount
+		for x in coins:
+			for c in range(x, amount + 1):
+				f[c] = min(f[c], f[c - x] + 1)
+		return f[-1] if f[-1] < inf else -1
+# 2. 零钱兑换2
+class Solution1:
+	def change(self, amount, coins):
+		@cache
+		def dfs(i, c):
+			if i < 0:
+				return 1 if c == 0 else 0
+			if c < nums[i]:
+				return dfs(i - 1, c)
+			return dfs(i - 1, c) + dfs(i, c - nums[i])
+		return dfs(len(coins) - 1, amount)
 
+# 3.完全平方数
+class Solution1:
+	def numSquares(self, n):
+		nums = [x for x in range(1, n + 1)]
+		@cache
+		def dfs(i, c):
+			if i < 0:
+				return 0 if c == 0 else inf
+			if c < nums[i] ** 2:
+				return dfs(-1, c)
+			return min(dfs(i - 1, c), dfs(i, c - nums[i] ** 2) + 1)
+		return dfs(n - 1, n)
+## 内存优化
+@cache
+def dfs(i, c):
+	if i == 0:
+		return 0 if c == 0 else inf
+	if c < i * i:
+		return dfs(i - 1, c)
+	return min(dfs(i - 1, c), dfs(i, c - i * i) + 1)
 
+class Solution2:
+	def numSquares(self, n):
+		# nums = [x for x in range(1, n + 1)]
+		return dfs(isqrt(n), n)
 
-
-
-
+# 4.数位成本和为目标值的最大数字
+class Solution1:  # 超出内存限制
+	def largestNumber(self, cost, target):
+		@cache
+		def dfs(i, c, ans):
+			if i < 0:
+				return ans if c == 0 else '0'
+			if c >= cost[i]:
+				return max_a_b(dfs(i - 1, c, ans), dfs(i, c - cost[i], ans * 10 + i + 1))
+			return dfs(i - 1, c, ans)
+		def max_a_b(a, b):
+			a = str(a)
+			b = str(b)
+			if len(a) == len(b):
+				return max(a, b)
+			elif len(a) > len(b):
+				return a
+			else:
+				return b
+		ans = dfs(len(cost) - 1, target, 0)
+		return ans 
+## 一维的递推
+class Solution2:
+	def largestNumber(self, cost, target):
+		# n = len(cost)
+		f = [0] + [-inf] * target
+		for i in range(len(cost) - 1, -1, -1):
+			for c in range(cost[i], target + 1):
+				f[c] = max(f[c], f[c - cost[i]] * 10 + i + 1)
+		return str(f[-1]) if f[-1] > 0 else '0'
+## 内存优化
+class Solution3:
+	def largestNumber(self, cost, target):
+		def max_a_b(a, b):
+			a = str(a)
+			b = str(b)
+			if len(a) == len(b):
+				return max(a, b)
+			elif len(a) > len(b):
+				return a
+			else:
+				return b
+				
+		cost = [0] + cost
+		f = ['0'] * (target + 1)
+		f[0] = ''
+		for x in range(1, 10):
+			for c in range(cost[x], target + 1):
+				if f[c - cost[x]] != '0':
+					tmp = str(x) + f[c - cost[x]]
+					f[c] = max_a_b(f[c], tmp)
+		return f[-1]
