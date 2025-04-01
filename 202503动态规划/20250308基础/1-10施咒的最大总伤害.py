@@ -33,10 +33,12 @@ class Solution3:
 	def maximumTotalDamage(self, power):
 		cnt = Counter(power)
 		a = sorted(cnt.keys())
+		@cache
 		def dfs(i):
 			if i < 0:
 				return 0
 			x = a[i]
+			# j = i
 			j = bisect_left(a, x - 2)
 			# while j and a[j - 1] >= x - 2:
 			# 	j -= 1
@@ -60,6 +62,20 @@ class Solution4:
 		return f[-1]
 
 	
+class Solution5:
+	def maximumTotalDamage(self, power):
+		max_num = max(power) + 1
+		a = [0] * max_num
+		for x in power:
+			a[x] += x
+		@cache
+		def dfs(i):
+			if i < 0:
+				return 0
+			return max(dfs(i - 1), dfs(i - 3) + a[i])
+		return dfs(max_num - 1)
+
+
 if __name__ == '__main__':
 	power = [7,1,6,3]
 	print(Solution4().maximumTotalDamage(power))

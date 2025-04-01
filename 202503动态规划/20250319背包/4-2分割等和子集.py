@@ -29,7 +29,21 @@ class Solution2:
 				# else:
 				# 	f[i + 1][c] = f[i][c] or f[i][c - x]
 		return f[n][target]
+	
+class Solution3:
+	def canPartition(self, nums):
+		s = sum(nums)
+		if s % 2 == 1:
+			return False
+		@cache
+		def dfs(i, c):
+			if i < 0:
+				return True if c == 0 else False
+			if c < nums[i]:
+				return dfs(i - 1, c)
+			return dfs(i - 1, c) or dfs(i - 1, c - nums[i])
+		return dfs(len(nums) - 1, s // 2)
 
 if __name__ == '__main__':
 	nums = [1, 5, 11 ,5]
-	print(Solution2().canPartition(nums))
+	print(Solution3().canPartition(nums))
