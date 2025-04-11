@@ -353,7 +353,133 @@ class Solution2:
 			f[i] = max(f[i + 1], f[j] + questions[i][0])
 		return f[0]
 
+# 20250402有序三元组中的最大值1
+class Solution1:
+	def maximumTripletValue(self, nums):
+		ans = 0
+		n = len(nums)
+		for p1 in range(n):
+			for p2 in range(p1 + 1, n):
+				if nums[p1] <= nums[p2]:
+					continue
+				for p3 in range(p2 + 1, n):
+					ans = max(ans, (nums[p1] - nums[p2]) * nums[k])
+		return ans
+## 枚举j
+class Solution2:
+	def maximumTripletValue(self, nums):
+		ans = 0
+		n = len(nums)
+		for j in range(1, n - 1):
+			a = max(nums[:j])
+			b = nums[j]
+			c = max(nums[j + 1:])
+			ans = max((a - b) * c, ans)
+		return ans
+## 灵神思路 —— 枚举k
+class Solution3:
+	def maximumTripletValue(self, nums):
+		ans = max_diff = pre_max = 0
+		for x in nums:
+			ans = max(ans, max_diff * x)
+			max_diff = max(max_diff, pre_max - x)
+			pre_max = max(pre_max, x)
+		return ans
 
+# 20250403有序三元组中的最大值2
+class Solution1:
+	def maximumTripletValue(self, nums):
+		ans = maxPre = maxDiff = 0
+		for x in nums:
+			ans = max(x * maxDiff, ans)
+			maxDiff = max(maxDiff, maxPre - x)  # 因为i < j，所以更新diff时不能把当下的x算成j
+			maxPre = max(maxPre, x)。# 更新i
+			# maxDiff = max(maxDiff, maxPre - x)
+		return ans
 
+# 20250404最深叶节点的最近公共祖先
+class TreeNode:
+	def __init__(self, val = 0, left = None, right = None):
+		self.val = val
+		self.left = left
+		self.right = right
 
+class Solution1::
+	def lcaDeepestLeaves(self, root):
+		n = len(root)
+		root_lis = []
+		i = 0
+		k = 1
+		while i < n:
+			root_lis.append(root[i:i + k])
+			i += k
+			k *= 2
+		ans = []
+		m = len(root_lis[-1])
+		for i in range(0, m, 2):
+			if root_lis[-1][i]:
+				ans.extend([root_lis[-2][i], root_lis[-1][i], root_lis[-1][i + 1]])
+		return ans
+
+# 20250408使数组元素互不相同所需的最少操作次数
+class Solution1:
+	def minimumOperations(self, nums):
+		dic_win = defaultdict(int)
+		n = len(nums)
+		for i in range(n - 1, -1, -1):
+			dic_win[nums[i]] += 1
+			if max(dic_win.values()) >= 2:
+				return i // 3 + 1
+		return 0
+
+# 20250409使数组的值全部为k的最少操作次数
+class Solution1:
+	def minOperations(self, nums, k):
+		mn = min(nums)
+		if mn < k:
+			return -1
+		elif mn == k:
+			return len(set(nums)) - 1
+		else:
+			return len(set(nums))
+## 指针
+class Solution2:
+	def minOperations(self, nums, k):
+		nums = set(nums)
+		nums.sort(reverse = True)
+		if nums[-1] < k:
+			return -1
+		ans = 0
+		for i, c in enumerate(nums):
+			if c > k:
+				ans += 1
+		return ans
+
+# 20250411统计对称整数的数目
+class Solution1:
+	def countSymmetricIntegers(self, low, high):
+		ans = 0
+		for x in range(low, high + 1):
+			x = str(x)
+			if len(x) % 2 == 0:
+				mid = len(x) // 2
+				left = 0
+				right = 0
+				for i, c in enumerate(x):
+					if i < mid:
+						left += int(c)
+					else:
+						right += int(c)
+				ans += int(left == right)
+		return ans
+## 灵神思路
+class Solution2:
+	def countSymmetricIntegers(self, low, high):
+		ans = 0
+		for x in range(low, high + 1):
+			x = str(x)
+			mid = len(x) // 2
+			if n % 2 == 0 and sum(map(ord, x[:mid]) == sum(map(ord, x[mid:]))):
+				ans += 1
+		return ans
 

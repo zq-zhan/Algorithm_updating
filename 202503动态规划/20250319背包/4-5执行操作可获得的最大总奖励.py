@@ -51,7 +51,18 @@ class Solution3:
 			ans -= 1
 		return ans
 
+class Solution4:
+	def maxTotalReward(self, rewardValues):
+		nums = sorted(set(rewardValues), reverse = True)
+		@cache
+		def dfs(i, c):
+			if i < 0:
+				return c
+			if nums[i] <= c:
+				return dfs(i - 1, c)
+			return max(dfs(i - 1, c), dfs(i - 1, c + nums[i]))
+		return dfs(len(nums) - 1, 0)
 
 if __name__ == '__main__':
 	rewardValues = [1,1,3,3]
-	print(Solution3().maxTotalReward(rewardValues))
+	print(Solution4().maxTotalReward(rewardValues))

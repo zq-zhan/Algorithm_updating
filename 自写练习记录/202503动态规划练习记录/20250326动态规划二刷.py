@@ -648,4 +648,257 @@ class Solution1:
 			return dfs(i - 1, c) or dfs(i - 1, c - nums[i])
 		return dfs(len(nums) - 1, s // 2)
 
+# 3.目标和
+class Solution1:
+	def findTargetSumWays(self, nums, target):
+		n = len(nums)
+		@cache
+		def dfs(i, c):
+			if i < 0:
+				return 1 if c == 0 else 0
+			# if c < nums[i]:  错误，因为可以<0
+			# 	return dfs(i - 1, c + nums[i])
+			return dfs(i - 1, c - nums[i]) + dfs(i - 1, c + nums[i])
+		return dfs(n - 1, target)
+## 递推——错解
+class Solution2:
+	def findTargetSumWays(self, nums, target):
+		n = len(nums)
+		s = sum(nums)
+		if target > s:
+			return 0
+		f = [[0] * (s + 1) for _ in range(n + 1)]
+		f[0][0] = 1
+		for i, x in enumerate(nums):
+			for c in range(s + 1):
+				if c < x:
+					f[i + 1][c] = f[i][c + x]
+				else:
+					f[i + 1][c] = f[i][c - x] + f[i][c + x]
+		return f[-1][target]
+## 递推
+class Solution3:
+	def findTargetSumWays(self, nums, target):
+		n = len(nums)
+		s = sum(nums)
+		if abs(target) > s:
+			return 0
+		f = [[0] * (2 * s + 1) for _ in range(n + 1)]
+		f[0][s] = 1
+		for i, x in enumerate(nums):
+			for c in range(2 * s + 1):
+				if c - x >= 0:
+					f[i + 1][c] += f[i][c - x]
+				if c + x <= 2 * s:
+					f[i + 1][c] += f[i][c + x]
+		return f[-1][s + target]
+
+# 4.将一个数字表示成幂的和的方案数
+class Solution1:
+	def numberOfWays(self, n, x):
+		mod = 10 ** 9 + 7
+		left, right = 0, n + 1
+		while left + 1 < right:
+			mid = (left + right) // 2
+			if mid ** x >= n:
+				right = mid
+			else:
+				left = mid
+		# mod = (10 ** 9) + 7
+		# target = int(math.pow(n, 1/x)) + 1
+		
+		@cache
+		def dfs(i, c):
+			if i <= 0:
+				return 1 if c == 0 else 0
+			if c < i ** x:
+				return dfs(i - 1, c) % mod
+			# ## 优化
+			# if i <= 0 or c <= 0:
+			# 	return 1 if c == 0 else 0
+			return (dfs(i - 1, c - i ** x) + dfs(i - 1, c)) % mod
+		return dfs(right, n) % mod
+## 递推写法
+class Solution2:
+	def numberOfWays(self, n, x):
+		mod = 10 ** 9 + 7
+		left, right = 0, n + 1
+		while left + 1 < right:
+			mid = (left + right) // 2
+			if mid ** x >= n:
+				right = mid
+			else:
+				left = mid
+
+		f = [[0] * (n + 1) for _ in range(right + 1)]
+		f[0][0] = 1
+		for i in range(right):
+			for c in range(n + 1):
+				if c < (i + 1) ** x:
+					f[i + 1][c] = f[i][c]
+				else:
+					f[i + 1][c] = f[i][c] + f[i][c - (i + 1) ** x]
+		return f[-1][-1]
+
+# 5.执行操作可获得的最大总奖励1
+class Solution1:
+	def maxTotalReward(self, rewardValues):
+		nums = sorted(set(rewardValues), reverse = True)
+		@cache
+		def dfs(i, c):
+			if i < 0:
+				return c
+			if nums[i] <= c:
+				return dfs(i - 1, c)
+			return max(dfs(i - 1, c), dfs(i - 1, c + nums[i]))
+		return dfs(len(nums) - 1, 0)
+
+
+################### 完全背包 #############
+# 1.零钱兑换
+class Solution1:
+	def coinChange(self, coins, amount):
+		@cache
+		def dfs(i, c):
+			if i < 0:
+				return 0 if c == 0 else inf
+			if coins[i] > c:
+				return dfs(i - 1, c)
+			return min(dfs(i - 1, c), dfs(i, c - coins[i]) + 1)
+		ans = dfs(len(coins) - 1, amount)
+		return ans if ans < inf else -1
+
+# 2.零钱兑换2
+class Solution1:
+	def change(self, amount, coins):
+		@cache
+		def dfs(i, c):
+			if i < 0:
+				return 1 if c == 0 else 0
+			if coins[i] > c:
+				return dfs(i - 1, c)
+			return dfs(i - 1, c) + dfs(i, c - coins[i])
+		return dfs(len(coins) - 1, amount)
+## 递推写法
+class Solution2:
+	def change(self, amount, coins):
+		n = len(coins)
+		f = [[0] * (amount + 1) for _ in range(n + 1)]
+		f[0][0] = 1
+		for i, x in enumerate(coins):
+			for c in range(amount + 1):
+				if c < x:
+					f[i + 1][c] = f[i][c]
+				else:
+					f[i + 1][c] = f[i][c] + f[i + 1][c - x]
+		return f[-1][-1]
+
+# 3.完全平方数
+class Solution1:
+	def numSquares(self, n):
+		@cache
+		def dfs(i, c):
+			if i == 0:
+				return 0 if c == 0 else inf
+			if i ** 2 > c:
+				return dfs(i - 1, c)
+			return min(dfs(i, c - i ** 2) + 1, dfs(i - 1, c))
+		return dfs(isqqrt(n) + 1, n)
+
+# 4.数位成本和为目标值的最大数字
+class Solution4:
+	def largestNumber(self, cost, target):
+		@cache
+		def dfs(i, c, char):
+			if i < 0:
+				return int(char) if c == 0 else 0
+			if c < cost[i]:
+				return dfs(i - 1, c, char)
+			return max(dfs(i, c - cost[i], char + str(i + 1)), dfs(i - 1, c, char))
+		return dfs(len(cost) - 1, target, '')
+
+
+#################### 多重背包 ################
+# 1.获得分数的方法数
+class Solution1:
+	def waysToReachTarget(self, target, types):
+		@cache
+		def dfs(i, c, type):
+			if i < 0:
+				return 1 if c == 0 else 0
+			if type[1] > c or type[0] == 0:
+				return dfs(i - 1, c, types[i - 1])
+			temp = type.copy()
+			temp[0] -= 1
+			return dfs(i, c - types[1], temp) + dfs(i - 1, c, types[i - 1])
+		return dfs(len(types) - 1, target, types[-1])
+## 灵神题解
+class Solution1:
+	def waysToReachTarget(self, target, types):
+		mod = 10 ** 9 + 7
+		@cache
+		def dfs(i, c):
+			if i < 0:
+				return 1 if c == 0 else 0
+			res = dfs(i - 1, c)
+			for _ in range(types[i][0]):
+				c -= types[i][1]
+				if c < 0:
+					break
+				res = (res + dfs(i - 1, c)) % mod
+			return res
+		return dfs(len(types) - 1, target)
+class Solution3:
+	def waysToReachTarget(self, target, types):
+		mod = 10 ** 9 + 7
+		@cache
+		def dfs(i, c):
+			if i < 0:
+				return 1 if c == 0 else 0
+			count, marks = types[i]
+			res = 0
+			for k in range(min(count, c // marks) + 1):
+				res += dfs(i - 1, c - marks * k)
+			return res % mod
+		return dfs(len(types) - 1, target)
+
+################# 分组背包 ##################
+# 1.掷骰子等于目标和的方法数
+class Solution1:
+	def numRollsToTarget(self, n, k, target):
+		## 优化
+		if not (n <= target <= n * k):
+			return 0
+		mod = 10 ** 9 + 7
+		@cache
+		def dfs(i, c):
+			if i == 0:
+				return 1 if c == 0 else 0
+			res = 0
+			for j in range(1, min(k, c) + 1):
+				res += dfs(i - 1, c - j)
+			return res % mod
+		return dfs(n, target)
+## 递推写法
+class Solution2:
+	def numRollsToTarget(self, n, k, target):
+		## 优化
+		if not (n <= target <= n * k):
+			return 0
+		mod = 10 ** 9 + 7
+		f = [[0] * (target + 1) for _ in range(n + 1)]
+		f[0][0] = 1  # dfs(0, 0) = 1
+		for i in range(1, n + 1):
+			for j in range(target + 1):
+				for x in range(1, min(k, j) + 1):
+					f[i][j] = (f[i][j] + f[i - 1][j - x]) % mod
+		return f[-1][-1]
+
+
+
+
+
+
+
+
 

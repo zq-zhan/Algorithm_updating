@@ -55,8 +55,19 @@ class Solution3:
 					f[c] = max_a_b(f[c], tmp)
 		return f[-1]
 	
+class Solution4:
+	def largestNumber(self, cost, target):
+		@cache
+		def dfs(i, c, char):
+			if i < 0:
+				return int(char) if c == 0 else 0
+			if c < cost[i]:
+				return dfs(i - 1, c, char)
+			return max(dfs(i, c - cost[i], char + str(i + 1)), dfs(i - 1, c, char))
+		return dfs(len(cost) - 1, target, '')
+	
 if __name__ == '__main__':
 	cost = [4, 3, 2, 5, 6, 7, 2, 5, 5]
 	target = 9
-	s = Solution3()
+	s = Solution4()
 	print(s.largestNumber(cost, target))

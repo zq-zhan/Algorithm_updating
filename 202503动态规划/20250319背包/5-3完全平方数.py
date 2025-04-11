@@ -28,8 +28,22 @@ class Solution2:
 		# nums = [x for x in range(1, n + 1)]
 		return dfs(isqrt(n), n)
 
+
+
+class Solution3:
+	def numSquares(self, n):
+		@cache
+		def dfs(i, c):
+			if i == 0:
+				return 0 if c == 0 else inf
+			if i ** 2 > c:
+				return dfs(i - 1, c)
+			return min(dfs(i, c - i ** 2) + 1, dfs(i - 1, c))
+		return dfs(isqrt(n) + 1, n)
+
+
 	
 if __name__ == '__main__':
 	n = 12
-	s = Solution2()
+	s = Solution3()
 	print(s.numSquares(n))
