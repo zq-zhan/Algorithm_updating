@@ -393,7 +393,7 @@ class Solution1:
 		for x in nums:
 			ans = max(x * maxDiff, ans)
 			maxDiff = max(maxDiff, maxPre - x)  # 因为i < j，所以更新diff时不能把当下的x算成j
-			maxPre = max(maxPre, x)。# 更新i
+			maxPre = max(maxPre, x)  # 更新i
 			# maxDiff = max(maxDiff, maxPre - x)
 		return ans
 
@@ -479,7 +479,117 @@ class Solution2:
 		for x in range(low, high + 1):
 			x = str(x)
 			mid = len(x) // 2
-			if n % 2 == 0 and sum(map(ord, x[:mid]) == sum(map(ord, x[mid:]))):
+			if len(x) % 2 == 0 and sum(map(ord, x[:mid])) == sum(map(ord, x[mid:])):
 				ans += 1
 		return ans
 
+# 20250414统计好三元组
+class Solution1:
+	def countGoodTriplets(self, arr, a, b, c):
+		ans = 0
+		n = len(arr)
+		for j in range(1, n - 1):
+			for i in range(0, j):
+				if abs(arr[i] - arr[j]) > a:
+					continue
+				for k in range(j + 1, n):
+					if abs(arr[j] - arr[k]) <= b and abs(arr[i] - arr[k]) <= c:
+						ans += 1
+					else:
+						continue
+		return ans
+# 20250415统计数组中好三元组数目
+class Solution1:
+	def goodTriplets(self, nums1, nums2):
+		def check_num(lis1, lis2, lis3):
+			ans = 0
+			if not lis1 or not lis2 or not lis3:
+				return ans
+			length1 = len(lis1)
+			length2 = len(lis2)
+			length3 = len(lis3)
+			for k in range(length3 - 1, -1, -1):
+				z = lis3[k]
+				for j in range(length2 - 1, -1, -1):
+					y = lis2[j]
+					if y >= z:
+						continue
+					for i in range(length1 - 1, -1, -1):
+						x = lis1[i]
+						if x >= y:
+							continue
+						else:
+							ans += i + 1
+							break
+			return ans
+
+
+		nums2_dic = defaultdict(list)
+		for i, x in enumerate(nums2):
+			nums2_dic[x].append(i)
+		n = len(nums1)
+		result = 0
+		for y in range(1, n - 1):
+			y_2 = nums2_dic[nums1[y]]
+			for x in range(0, y):
+				x_2 = nums2_dic[nums1[x]]
+				for z in range(y + 1, n):
+					z_2 = nums2_dic[nums1[z]]
+					result += check_num(x_2, y_2, z_2)
+		return result
+class Solution2:  # 数组内元素互不相同
+	def goodTriplets(self, nums1, nums2):
+
+		nums2_dic = defaultdict(int)
+		for i, x in enumerate(nums2):
+			nums2_dic[x] = i
+		n = len(nums1)
+		result = 0
+		for y in range(1, n - 1):
+			y_2 = nums2_dic[nums1[y]]
+			for x in range(0, y):
+				x_2 = nums2_dic[nums1[x]]
+				for z in range(y + 1, n):
+					z_2 = nums2_dic[nums1[z]]
+					if x_2 < y_2 < z_2:
+						result += 1
+		return result
+## 怎样理解这也是一个最长公共子序列问题
+class Solution3:
+	def goodTriplets(self, nums1, nums2):
+
+# 20250416统计好子数组的数目
+class Solution1:
+	def countGood(self, nums, k):
+		dic_win = defaultdict(int)
+		ans = 0
+		left = 0
+		right = 0
+		n = len(nums)
+		temp_ans = 0
+		while right < n:
+			dic_win[nums[right]] += 1
+			temp_ans += dic_win[nums[right]] - 1
+			# for val in dic_win.values():
+			# 	temp_ans += val * (val - 1) // 2
+			while temp_ans >= k:
+				ans += n - right
+				temp_ans -= dic_win[nums[left]] - 1
+				dic_win[nums[left]] -= 1
+				left += 1
+			right += 1
+		return ans
+## 灵神写法
+class Solution2:
+	def countGood(self, nums, k):
+		dic_win = defaultdict(int)
+		ans, left, temp_ans = 0, 0, 0
+		for x in nums:
+			dic_win[x] += 1
+			temp_ans += dic_win[x] - 1
+			while temp_ans >= k:
+				temp_ans -= dic_win[nums[left]] - 1
+				dic_win[nums[left]] -= 1
+				left += 1
+			ans += left
+		return ans
