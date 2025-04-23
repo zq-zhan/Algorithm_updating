@@ -593,3 +593,164 @@ class Solution2:
 				left += 1
 			ans += left
 		return ans
+
+# 20250417统计数组中相等且可以被整除的数对
+class Solution1:
+	def countPairs(self, nums, k):
+		ans = 0
+		nums_dic = defaultdict(list)
+		for i, c in enumerate(nums):
+			nums_dic[c].append(i)
+
+		for same_lis in nums_dic.values():
+			if len(same_lis) < 2:
+				continue
+			# n = len(same_lis)
+			# for i in range(n - 1):
+			# 	ord_1 = same_lis[i]
+			# 	for j in range(i + 1, n):
+			# 		ord_2 = same_lis[j]
+			# 		if (ord_1 * ord_2) % 2 == 0:
+			# 			ans += 1 
+			for i, x in enumerate(same_lis):
+				for y in same_lis[i + 1:]:
+					if (x * y) % k == 0:
+						ans += 1
+		return ans
+## 优化
+class Solution2:
+	def countPairs(self, nums, k):
+		ans = 0
+		nums_dic = defaultdict(list)
+		for j in range(len(nums)):
+			val = nums[j]
+			for i in nums_dic[val]:
+				if (j * i) % k == 0:
+					ans += 1
+			nums_dic[val].append(j)
+		return ans
+
+# 20250418统计坏数对的数目
+class Solution1:  # 超出时间复杂度
+	def countBadPairs(self, nums):
+		ans = 0
+		n = len(nums)
+		for i in range(n - 1):
+			for j in range(i + 1, n):
+				if j - i != nums[j] - nums[i]:
+					ans += 1
+		return ans
+## 灵神题解
+class Solution2:
+	def countBadPairs(self, nums):
+		ans = comb(len(nums), 2)
+		cnt = defaultdict(int)
+		for i, c in enumerate(nums):
+			ans -= cnt[x - i]
+			cnt[x - i] += 1
+		return ans
+
+# 20250419统计公平数对的数目
+class Solution1:
+	def countFairPairs(self, nums, lower, upper):
+		ans = 0
+		n = len(nums)
+		for i, c in enumerate(nums):
+			for j in range(i + 1, n):
+				if lower <= c + nums[j] <= upper:
+					ans += 1
+		return ans
+## 优化——灵神题解——二分法
+class Solution2:
+	def countFairPairs(self, nums, lower, upper):
+		nums.sort()
+		ans = 0
+		for j, c in enumerate(nums):
+			right = bisect_right(nums, upper - c, 0, j)  # 从0到j-1之间的元素
+			left = bisect_left(nums, lower - c, 0, j)
+			ans += right - left
+		return ans
+## 排序不影响结果-相向三指针
+class Solution:
+    def countFairPairs(self, nums, lower, upper):
+        nums.sort()
+        ans = 0
+        l = r = len(nums)
+        for j, x in enumerate(nums):
+            while r and nums[r - 1] > upper - x:
+                r -= 1
+            while l and nums[l - 1] >= lower - x:
+                l -= 1
+            # 在方法一中，二分的结果必须 <= j，方法二同理
+            ans += min(r, j) - min(l, j)
+        return ans
+
+# 20250420森林中的兔子
+class Solution1:
+	def numRabbits(self, answers):
+		ans_dic = Counter(answers)
+		ans = 0
+		for key, cnt in ans_dic.items():
+			# ans += ((cnt - 1) // (key + 1) + 1) * (key + 1)
+			ans += (cnt + key) // (key + 1) * (key + 1)
+		return ans
+
+# 20250421统计隐藏数组数目
+class Solution1:
+	def numberOfArrays(self, differences, lower, upper):
+		ans = True
+		n = len(differences)
+		@cache
+		def dfs(i, c):
+			if i < 1:
+				return True
+			if lower <= c - differences[i - 1] <= upper:
+				return dfs(i - 1, c - differences[i - 1])
+			else:
+				return False
+
+		return sum(int(dfs(n, x)) for x in range(lower, upper + 1))
+## 灵神题解			
+class Solution1:
+	def numberOfArrays(self, differences, lower, upper):
+		x = mi = mx = 0
+		for d in differences:
+			x += d
+			mi = min(mi, x)
+			mx = max(mx, x)
+		return max(upper - lower - (mx - mi) + 1, 0)
+
+# 20250422统计理想数组的数目
+class Solution1:
+	def idealArrays(self, n, maxValue):
+		@cache
+		def dfs(i, c, cnt):
+			if i < 0:
+				return 1
+			for x in range(1, maxValue + 1):
+				if c % x == 0:
+					return dfs(i - 1, x)
+				else:
+					return 0
+		return sum(dfs(n - 1, x) for x in range(1, maxValue + 1))
+
+# 20250423统计最大组的数目
+class Solution1:
+	def countLargestGroup(self, n):
+		dic_win = defaultdict(int)
+		max_cnt = ans = 0
+		for x in range(1, n + 1):
+			val = 0
+			for char in str(x):
+				val += int(char)
+			dic_win[val] += 1
+			if dic_win[val] > max_cnt:
+				max_cnt = dic_win[val]
+				ans = 1
+			elif dic_win[val] == max_cnt:
+				ans += 1
+		# max_cnt = max(dic_win.values())
+		# return sum(int(val == max_cnt) for val in dic_win.values())
+		return max_cnt
+
+
