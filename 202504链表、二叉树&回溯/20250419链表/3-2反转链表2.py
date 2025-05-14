@@ -1,3 +1,9 @@
+class ListNode:
+	def __init__(self, val = 0, next = None):
+		self.val = val
+		self.next = next
+
+
 # 2.反转链表2
 class Solution2:
 	def reverseBetween(self, head, left, right):
@@ -16,3 +22,10 @@ class Solution2:
 		p0.next.next = cur
 		p0.next = pre
 		return dummy.next
+	
+if __name__ == '__main__':
+	head = ListNode(1, ListNode(2, ListNode(3, ListNode(4, ListNode(5)))))
+	left = 2
+	right = 4
+	print(Solution2().reverseBetween(head, left, right))
+	

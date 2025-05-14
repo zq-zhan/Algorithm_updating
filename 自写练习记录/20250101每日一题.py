@@ -753,4 +753,136 @@ class Solution1:
 		# return sum(int(val == max_cnt) for val in dic_win.values())
 		return max_cnt
 
+# 20250424统计完全子数组的数目
+class Solution1:
+	def countCompleteSubarrays(self, nums):
+		n = len(set(nums))
+		ans = left = 0
+		dic_win = defaultdict(int)
+		for right, c in enumerate(nums):
+			dic_win[c] += 1
+			while len(dic_win) == n:
+				if dic_win[nums[left]] == 1:
+					del dic_win[nums[left]]
+				else:
+					dic_win[nums[left]] -= 1
+				left += 1
+			ans += left
+		return ans
+
+# 20250425统计趣味子数组的数目
+class Solution1:  # 错解，这不是越长越合法、也不是越短越合法
+	def countInterestingSubarrays(self, nums, modulo, k):
+		cnt = 0
+		left = ans = 0
+		for right, c in enumerate(nums):
+			cnt += 1 if c % modulo == k else 0
+			while cnt % modulo == k:
+				cnt -= 1 if nums[left] % modulo == k else 0
+				left += 1
+			ans += left
+		return ans
+## 灵神题解——前缀和
+class Solution2:
+	def countInterestingSubarrays(self, nums, modulo, k):
+		pre_sum = list(accumulate((x % modulo == k for x in nums), initial = 0))
+		cnt = [0] * min(len(nums) + 1, modulo)
+		ans = 0
+		for s in pre_sum:
+			if s >= k:
+				ans += cnt[(s - k) % modulo]  # 枚举右、维护左
+			cnt[s % modulo] += 1
+		return ans
+
+# 20250426统计定界子数组的数目
+class Solution1:  # 暴力解法
+	def countSubarrays(self, nums, minK, maxK):
+		ans = 0
+		n = len(nums)
+		for left in range(n):
+			mn = inf
+			mx = 0
+			for right in range(left, n):
+				mn = min(nums[right], mn)
+				mx = max(nums[right], mx)
+				if mn == minK and mx == maxK:
+					ans += 1
+		return ans
+## 
+class Solution2:
+	def countSubarrays(self, nums, minK, maxK):
+		ans = 0
+		minI = maxI = i0 = -1
+		for right, c in enumerate(nums):
+			if c == minK:
+				minI = right
+			if c == maxK:
+				maxI = right
+			if not minK <= c <= maxK:
+				i0 = right
+			ans += max(min(minI, maxI) - i0, 0)
+		return ans
+
+# 20250427统计符合条件长度为3的子数组数目
+class Solution1:
+	def countSubarrays(self, nums):
+		ans = left = 0
+		for right, c in enumerate(nums):
+			# if right - left + 1 < 3:
+			# 	continue
+			# if nums[left] + nums[right] == nums[left + 1] // 2:
+			# 	ans += 1
+			# left += 1
+			if right - left + 1 == 3:
+				if nums[left] + nums[right] == nums[left + 1] / 2:
+					ans += 1
+				left += 1
+		return ans
+
+# 20250428统计得分小于K的子数组数目
+class Solution1:
+	def countSubarrays(self, nums, k):
+		# n = len(nums)
+		ans = left = 0
+		tmp_sum = 0
+		for right, c in enumerate(nums):
+			tmp_sum += c
+			while tmp_sum * (right - left + 1) >= k:
+				tmp_sum -= nums[left]
+				left += 1
+			ans += right - left + 1
+		return ans
+
+# 20250429统计最大元素出现至少k次的子数组
+class Solution1:  # 越长越合法
+	def countSubarrays(self, nums, k):
+		max_num = max(nums)
+		ans = left = cnt = 0
+		for right, c in enumerate(nums):
+			cnt += 1 if c == max_num else 0
+			while cnt == k:
+				cnt -= 1 if nums[left] == max_num else 0
+				left += 1
+			ans += left
+		return ans
+## 补充
+## 子数组的最小值之和————不会！！！
+class Solution1:
+	def sumSubarrayMins(self, arr):
+		mod = 10 ** 9 + 7
+		ans = 0
+		n = len(arr)
+		for x in arr:
+			left, right = 0, n - 1
+
+# 20250430统计位数为偶数的数字
+class Solution1:
+	def findNumbers(self, nums):
+		# ans = 0
+		# for x in nums:
+		# 	ans += int(len(x) % 2 == 0)
+		# return ans
+		return sum(len(str(x)) % 2 == 0 for x in nums)
+
+
 

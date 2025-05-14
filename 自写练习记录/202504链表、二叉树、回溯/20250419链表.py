@@ -366,3 +366,258 @@ class Solution2:
 			cnt += 1
 		return dummy.next
 
+
+############## 反转链表 #########
+# 1.反转链表
+class Solution1:
+	def reverseList(self, head):
+		pre = None
+		cur = head
+		while cur:
+			nxt = cur.next
+			cur.next = pre
+			pre = cur
+			cur = nxt
+		return pre
+
+class Solution2:
+	def reverseList(self, head):
+		p0 = dummy = ListNode(next = head)
+		pre = None
+		cur = p0.next
+		while cur:
+			nxt = cur.next
+			cur.next = pre
+			pre = cur
+			cur = nxt
+		p0.next = pre
+		return dummy.next
+
+
+
+# 2.反转链表2
+class Solution2:
+	def reverseBetween(self, head, left, right):
+		p0 = dummy = ListNode(next = head)
+		for _ in range(left - 1):
+			p0 = p0.next
+
+		pre = None
+		cur = p0.next
+		for _ in range(right - left + 1):
+			nxt = cur.next
+			cur.next = pre
+			pre = cur
+			cur = nxt
+
+		p0.next.next = cur
+		p0.next = pre
+		return dummy.next
+
+# 3.两两交换链表中的节点
+class Solution1:
+	def swapPairs(self, head):
+		n = 0
+		cur = head
+		while cur:
+			n += 1
+			cur = cur.next
+
+		dummy = ListNode(next = head)
+		p0 = dummy
+		pre = None
+		cur = p0.next
+		while n >= 2:
+			n -= 2
+			# pre = None
+			# cur = p0.next
+			for _ in range(2):
+				nxt = cur.next
+				cur.next = pre
+				pre = cur
+				cur = nxt
+
+			nxt = p0.next  # 1
+			p0.next.next = cur # 3
+			p0.next = pre  # 2
+			p0 = nxt  # 1 此时为3的上一个节点
+		return dummy.next
+
+# 4.K个一组翻转链表
+class Solution1:
+	def reverseKGroup(self, head, k):
+		n = 0
+		cur = head
+		while cur:
+			n += 1
+			cur = cur.next
+
+		p0 = dummy = ListNode(next = head)
+		pre = None
+		cur = p0.next
+		while n >= k:
+			n -= k
+			for _ in range(k):
+				nxt = cur.next
+				cur.next = pre
+				pre = cur
+				cur = nxt
+
+			nxt = p0.next
+			p0.next.next = cur
+			p0.next = pre
+			p0 = nxt
+		return dummy.next
+
+# 5.反转偶数长度组的节点
+class Solution1:
+	def reverseEvenLengthGroups(self, head):
+		n = 0
+		cur = head
+		while cur:
+			cur = cur.next
+			n += 1
+
+		p0 = dummy = ListNode(next = head)
+		pre = None
+		cur = p0.next
+		cnt = 1
+		while n >= cnt:
+			n -= cnt
+			if cnt % 2 != 0:
+				for _ in range(cnt):
+					p0 = p0.next
+					cur = p0.next
+			else:
+				for _ in range(cnt):
+					nxt = cur.next
+					cur.next = pre
+					pre = cur
+					cur = nxt
+
+				nxt = p0.next
+				p0.next.next = cur
+				p0.next = pre
+				p0 = nxt
+			cnt += 1
+		if n >= 2 and n % 2 == 0:
+			for _ in range(n):
+				nxt = cur.next
+				cur.next = pre
+				pre = cur
+				cur = nxt
+			p0.next.next = cur
+			p0.next = pre
+		return dummy.next
+
+################## 插入节点 ################
+# 1.在链表中插入最大公约数
+class Solution1:
+	def insertGreatestCommonDivisors(self, head):
+		def find_mx(a, b):
+			mn = min(a, b)
+			for x in range(mn, 0, -1):
+				if a % x == 0 and b % x == 0:
+					return x
+			return 1
+
+		cur = head
+		while cur.next:
+			node_val = find_mx(cur.val, cur.next.val)
+			# insert = ListNode(node_val)
+			# nxt = cur.next  # 10
+			# cur.next = insert  # 6
+			# cur.next.next = nxt  # 10
+			# cur = nxt
+			nxt = cur.next
+			cur.next = ListNode(node_val, next = cur.next)
+			cur = nxt
+		return head
+## 灵神写法
+class Solution1:
+	def insertGreatestCommonDivisors(self, head):
+		cur = head
+		while cur.next:
+			cur.next = ListNode(gcd(cur.val, cur.next.val), next = cur.next)
+			cur = cur.next.next
+		return head
+
+# 2.对链表进行插入排序
+class Solution1:
+	def insertionSortList(self, head):
+		p0 = dummy = ListNode(next = head)
+		cur = p0.next
+		pre = None
+		while cur:
+			while cur.next.val < cur.val:
+				nxt = cur.next
+				cur.next = pre
+				pre = cur
+				cur = nxt
+			p0.next.next = cur
+			cur = cur.next
+		return dummy.next
+##
+class Solution1:
+	def insertionSortList(self, head):
+		dummy = ListNode(-inf)
+		pre = dummy
+		tail = dummy
+		cur = head:
+		while cur:
+			if tail.val < cur.val:
+				tail.next = cur
+				tail = cur
+				cur = cur.next
+			else:
+				tmp = cur.next
+				tail.next = tmp
+				while pre.next and pre.next.val < cur.val:
+					pre = pre.next
+				cur.next = pre.next
+				pre.next = cur
+				pre = dummy
+				cur = tmp
+		return dummy.next
+
+class Solution2:
+    def insertionSortList(self, head):
+     	# 找个排头
+        dummy = ListNode(-1)
+        pre = dummy
+        # 依次拿head节点
+        cur = head
+        while cur:
+        	# 把下一次节点保持下来
+            tmp = cur.next
+            # 找到插入的位置（最后一个小于当前节点的节点）
+            while pre.next and pre.next.val < cur.val:
+                pre = pre.next
+            # 进行插入操作
+            cur.next = pre.next  # 此时pre.next的值是第一个大于cur的值的节点，这就是cur要插入的位置
+            pre.next = cur  # pre的值小于cur的值，所以pre.next指向cur
+            pre = dummy  # 重新初始化pre，因为后续要重新查找插入的位置
+            cur = tmp  #依次遍历head的所有节点
+        return dummy.next
+## 写法三
+class Solution3:
+	def insertionSortList(self, head):
+		if not head or not head.next:
+			return head
+		cur, nxt = head, head.next
+		dummy = ListNode(-inf)
+		dummy.next = head
+		while nxt:
+			if nxt.val >= cur.val:
+				cur = nxt
+				nxt = nxt.next
+			else:
+				cur.next = nxt.next
+				pre1, pre2 = dummy, dummy.next
+				while nxt.val > pre2.val:
+					pre1 = pre2
+					pre2 = pre2.next
+				pre1.next = nxt
+				nxt.next = pre2
+				nxt = cur.next
+		return dummy.next
