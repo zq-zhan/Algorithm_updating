@@ -3,7 +3,7 @@
 from collections import defaultdict,Counter
 
 
-class Solution1:
+class Solution1:  # 错解
 	def maximumLength(self, s):
 		left, right = 0, 1
 		n = len(s)

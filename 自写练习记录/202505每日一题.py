@@ -298,6 +298,300 @@ class Solution1:
 				if ord(x) - ord_a > 0:
 					s += 'b' 
 
+# 20250515最长相邻不相等子序列
+class Solution1:
+	def getLongestSubsequence(self, words, groups):
+		ans = []
+		for i, c in enumerate(groups):
+			if i == 0 or groups[i] != groups[i - 1]:
+				ans.append(words[i])
+		return ans
+
+# 20250516最长相邻不相等子序列2
+class Solution1:
+	def getWordsInLongestSubsequence(self, words, groups):
+		groups.sort()
+		n = len(groups)
+		pre_word = ''
+		for i in range(n):
+			if i == 0:
+				pre_word = words[i]
+				continue
+			if i > 0 and groups[i] == groups[i - 1]:
+				continue
+
+			for j in range(len(pre_word)):
+
+
+# 20250517颜色分类
+class Solution1:
+	def sortColors(self, nums):
+		left = 0
+		for target in (0, 1):
+			right = left
+			while right < len(nums):
+				if nums[right] == target:
+					nums[left], nums[right] = nums[right], nums[left]
+					left += 1
+				right += 1
+
+# 20250519三角形类型
+class Solution1:
+	def triangleType(self, nums):
+		nums.sort()
+		if nums[0] + nums[1] <= nums[2]:
+			return 'none'
+
+		distinct_num = len(set(nums))
+		if distinct_num == 1:
+			return "equilateral"
+		elif distinct_num == 2:
+			return "isosceles"
+		else:
+			return "scalene"
+
+					
+# 20250520零数组变换1
+class Solution1:  # 超时
+	def isZeroArray(self, nums, queries):
+		for left, right in queries:
+			for i in range(left, right + 1):
+				if nums[i] > 0:
+					nums[i] -= 1
+		return all(x == 0 for x in nums)
+## 灵神题解——差分数组
+class Solution2:
+	def isZeroArray(self, nums, queries):
+		diff = [0] * (len(nums) + 1)
+		for left, right in queries:
+			diff[left] -= 1
+			diff[right + 1] += 1
+
+		new_arr = list(accumulate(d))[:-1]
+		return all(x + y <= 0 for x, y in zip(nums, new_arr))
+
+# 20250521零数组变换2
+class Solution1:  # O(nq)
+	def minZeroArray(self, nums, queries):
+		if sum(nums) == 0:
+			return 0
+		diff = [0] * (len(nums) + 1)
+		ans = 0
+		for left, right, val in queries:
+			diff[left] -= val
+			diff[right + 1] += val
+			new_arr = list(accumulate(diff))[:-1]
+			ans += 1
+			if all(x + y <= 0 for x, y in zip(new_arr, nums)):
+				return ans
+		return -1
+## 灵神题解——二分+差分
+class Solution2:  # O(nlogq)
+	def minZeroArray(self, nums, queries):
+		def check(k):
+			diff = [0] * (len(nums) + 1)
+			for left, right, val in queries[:k]:
+				diff[left] -= val
+				diff[right + 1] += val
+			for x, y in zip(nums, accumulate(diff)):
+				if x + y > 0:
+					return False
+			return True
+
+		n = len(queries)
+		left, right = -1, n + 1
+		while left + 1 < right:
+			mid = (left + right) // 2
+			if check(mid):
+				right = mid
+			else:
+				left = mid
+		return right if right <= n else -1
+## 灵神题解——双指针+差分
+class Solution:
+    def minZeroArray(self, nums, queries):
+        diff = [0] * (len(nums) + 1)
+        sum_d = k = 0
+        for i, (x, d) in enumerate(zip(nums, diff)):
+            sum_d += d
+            while k < len(queries) and sum_d < x:  # 需要添加询问，把 x 减小
+                l, r, val = queries[k]
+                diff[l] += val
+                diff[r + 1] -= val
+                if l <= i <= r:  # x 在更新范围中
+                    sum_d += val
+                k += 1
+            if sum_d < x:  # 无法更新
+                return -1
+        return k
+
+# 20250527分类求和并作差
+class Solution1:
+	def differenceOfSums(self, n, m):
+		ans = 0
+		left, right = 1, n
+		while left < right:
+			if left % m != 0:
+				ans += left
+			else:
+				ans -= left
+
+			if right % m != 0:
+				ans += right
+			else:
+				ans -= right
+			left += 1
+			right -= 1
+		if left == right:
+			ans += left if left % m != 0 else -left
+		return ans
+## 灵神思路
+class Solution1:
+	def differenceOfSums(self, n, m):
+		return n * (n + 1) // 2 - n // m * (n // m + 1) * m
+
+
+# 20250604从盒子中找出字典序最大的字符串1
+class Solution1:
+	def answerString(self, word, numFriends):
+		if numFriends == 1:
+			return word
+		n = len(word)
+		target_len = n - numFriends + 1
+		ans = ''
+		for i in range(n):
+			ans = max(ans, word[i:i + target_len])
+		return ans
+## 灵神题解
+class Solution:
+    def answerString(self, s, numFriends):
+        if numFriends == 1:
+            return s
+        n = len(s)
+        i, j = 0, 1
+        while j < n:
+            k = 0
+            while j + k < n and s[i + k] == s[j + k]:
+                k += 1
+            if j + k < n and s[i + k] < s[j + k]:
+                i, j = j, max(j + 1, i + k + 1)
+            else:
+                j += k + 1
+        return s[i: i + n - numFriends + 1]
+
+# 20250606使用机器人打印字典序最小的字符串
+class Solution:
+	def robotWithString(self, s):
+		mn = s[0]
+		cnt = 1
+		for i in range(1, len(s)):
+			if s[i] < mn:
+				cnt = 1
+				mn = s[i]
+			elif s[i] == mn:
+				cnt += 1
+			else:
+				continue
+
+		ans = ''
+		for i in range(len(s)):
+			if s[i] == mn:
+				if cnt == 1:
+					ans += s[i]
+					break
+				else:
+					ans += s[i]
+					cnt -= 1
+			else:
+				ans += s[i]
+		return ans[::-1] + s[i:]
+## 灵神题解
+class Solution:
+	def robotWithString(self, s):
+		'''
+		如果栈顶<=后缀s[i + 1:]中的最小值，就出栈
+		'''
+		n = len(s)
+		# 计算后缀最小值
+		suf_min = ['z'] * (n + 1)
+		for i in range(n - 1, -1, -1):
+			suf_min[i] = min(suf_min[i + 1], s[i])
+
+		ans = []
+		st = []
+		for i, x in enumerate(s):
+			st.append(x)
+			while st and st[-1] <= suf_min[i + 1]:
+				ans.append(st.pop())
+		return ''.join(ans)
+
+# 20250607删除星号以后字典序最小的字符串
+class Solution1:
+	def clearStars(self, s):
+		s = list(s)
+		st = [[] for _ in range(26)]
+		for i, x in enumerate(s):
+			if x != '*':
+				st[ord(x) - ord('a')].append(i)
+			else:
+				for val in st:
+					if val:
+						s[val.pop()] = '*'
+						break
+		return ''.join(x for x in s if x != '*')
+
+# 20250608字典序排数
+class Solution1:
+	def lexicalOrder(self, n):
+		ans = []
+		v = 1
+		for _ in range(n):
+			ans.append(v)
+			if v * 10 <= n:
+				v *= 10
+			else:
+				while v % 10 == 9 or v + 1 > n:
+					v //= 10
+				v += 1
+		return ans
+## 递归
+class Solution:
+	def lexicalOrder(self, n):
+		ans = []
+
+		def dfs(cur, limit):
+			if cur > limit:
+				return
+			ans.append(cur)
+			for i in range(10):
+				dfs(cur * 10 + i, limit)
+
+		for i in range(1, 10):
+			dfs(i, n)
+		return ans
+
+class Solution:
+	def findKthNumber(self, n: int, k: int) -> int:	
+		ans = []
+		v = 1
+		for _ in range(n):
+			ans.append(v)
+			if len(ans) == k:
+				return ans[-1]
+			if v * 10 <= n:
+				v *= 10
+			else:
+				while v % 10 == 9 or v + 1 > n:
+					v //= 10
+				v += 1
+		return ans
+
+
+
+
+
+
+
 
 
 

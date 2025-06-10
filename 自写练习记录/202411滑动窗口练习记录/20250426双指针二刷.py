@@ -513,3 +513,231 @@ class Solution2:
 				else:
 					left += 1
 		return ans
+
+# 2.删除最短的子数组使剩余数组有序
+class Solution1:
+	def findLengthOfShortestSubarray(self, arr):
+		n = len(arr)
+		ans = 0
+		left = right = 0
+		while left <= right and right <= n - 1:
+			if right > 0 and nums[right] >= nums[right - 1]:
+				right += 1
+			else:
+				left = right  #问题在于这样变化，不能保证left需不需要左移
+## 灵神题解——枚举左端点，移动右端点
+class Solution2:
+	def findLengthOfShortestSubarray(self, arr):
+		n = len(arr)
+		right = n - 1
+		while right and arr[right - 1] <= arr[right]:
+			right -= 1
+		if right == 0:
+			return 0
+
+		ans = right
+		left = 0
+		while left == 0 or arr[left - 1] <= arr[left]:
+			while right < n and arr[right] < arr[left]:
+				right += 1
+			ans = min(ans, right - left - 1)
+			left += 1
+		return ans
+
+class Solution3:
+	def findLengthOfShortestSubarray(self, arr):
+		n = len(arr)
+		right = n - 1
+		while right > 0 and arr[right - 1] <= arr[right]:
+			right -= 1
+		if right == 0:
+			return 0
+
+		ans = right
+		left = 0
+		while left == 0 or arr[left - 1] <= arr[left]:
+			while right < n and arr[right] < arr[left]:
+				right += 1
+			ans = min(ans, right - left - 1)
+			left += 1
+		return ans
+
+# 3.统计移除递增子数组的数目2
+class Solution1:
+	def incremovableSubarrayCount(self, nums):
+		n = len(nums)
+		right = n - 1 
+		while right > 0 and nums[right - 1] < nums[right]:
+			right -= 1
+		if right == 0:
+			return n * (n + 1) // 2
+
+		ans = n - right + 1
+		left = 0
+		while left == 0 or nums[left] > nums[left - 1]:
+			while right < n and nums[right] <= nums[left]:
+				right += 1
+			ans += n - right + 1
+			left += 1
+		return ans
+
+
+############## 原地修改 ################
+# 1.移除元素
+class Solution1:
+	def removeElement(self, nums, val):
+		# ans = 0
+		left, right = 0, len(nums) - 1
+		while left <= right:
+			if nums[left] == val:
+				nums[left], nums[right] = nums[right], nums[left]
+				right -= 1
+			else:
+				left += 1
+				# ans += 1
+		return left
+
+# 2.将数组按照奇偶性转化
+class Solution1:
+	def transformArray(self, nums):
+
+		left, right = 0, len(nums) - 1
+		while left <= right:
+			if nums[left] % 2 == 0:
+				nums[left] = 0
+				left += 1
+			else:
+				nums[left] = 1
+
+			if left <= right:
+				if nums[right] % 2 == 0:
+					nums[right] = nums[left]
+					nums[left] = 0
+					left += 1
+				else:
+					nums[right] = 1
+					right -= 1
+		return nums
+
+# 3.基于排列构建数组
+class Solution1:
+	def buildArray(self, nums):
+		ans = [0] * len(nums)
+		for i, c in enumerate(nums):
+			ans[i] = nums[c]
+		return ans
+
+# 4.数组中重复的数据
+class Solution1:
+	def findDuplicates(self, nums):
+		ans = []
+		dic_win = defaultdict(int)
+		for x in nums:
+			if dic_win[x] == 1:
+				ans.append(x)
+			dic_win[x] += 1
+		return ans
+## 优化
+class Solution1:
+	def findDuplicates(self, nums):
+		ans = []
+		n = len(nums)
+		for x in nums:
+			if nums[abs(x) - 1] < 0:
+				ans.append(abs(x))
+			else:
+				nums[abs(x) - 1] = - nums[abs(x) - 1]
+		return ans
+
+# 5.找到所有数组中消失的数字
+class Solution1:
+	def findDisappearedNumbers(self, nums):
+		# ans = []
+		for x in nums:
+			x = abs(x)
+			nums[x - 1] = -abs(nums[x - 1])
+		return [i + 1 for i, x in enumerate(nums) if x > 0]
+
+# 6.缺失的第一个正数
+class Solution1:
+	def firstMissingPositive(self, nums):
+		max_num = max(nums)
+		if max_num <= 0:
+			return 1
+		if len(nums) == 1:
+			if nums[0] > 1 or nums[0] <= 0:
+				return 1
+			else:
+				return nums[0] - 1
+		temp_lis = [0] * max_num
+		for x in nums:
+			if x <= 0:
+				continue
+			temp_lis[x - 1] = 1
+
+		for i, c in enumerate(temp_lis):
+			if c != 1:
+				return i + 1
+		return max_num + 1
+
+class Solution1:
+	def firstMissingPositive(self, nums):
+		nums = set(nums)
+		for i in range(2 ** 31 - 1):
+			if i + 1 not in nums:
+				return i + 1
+## 灵神题解
+class Solution:
+    def firstMissingPositive(self, nums):
+        n = len(nums)
+        for i in range(n):
+            # 如果当前学生的学号在 [1,n] 中，但（真身）没有坐在正确的座位上
+            while 1 <= nums[i] <= n and nums[i] != nums[nums[i] - 1]:
+                # 那么就交换 nums[i] 和 nums[j]，其中 j 是 i 的学号
+                j = nums[i] - 1  # 减一是因为数组下标从 0 开始
+                nums[i], nums[j] = nums[j], nums[i]
+
+        # 找第一个学号与座位编号不匹配的学生
+        for i in range(n):
+            if nums[i] != i + 1:
+                return i + 1
+
+        # 所有学生都坐在正确的座位上
+        return n + 1
+
+# 7.寻找重复数
+## 快慢指针解法
+class Solution:
+    def findDuplicate(self, nums):
+        slow = 0
+        fast = 0
+
+        while True:
+            # fast 前进两次，slow 前进一次
+            fast = nums[fast]
+            fast = nums[fast]
+            slow = nums[slow]
+            if slow == fast:
+                break
+
+        # ptr == slow 时说明检测到重复元素，两个重复元素同时指向环的入口。
+        ptr = 0
+        while ptr != slow:
+            ptr = nums[ptr]
+            slow = nums[slow]
+
+        return ptr
+## 二分解法
+class Solution:
+	def findDuplicate(self, nums):
+		min_val = 0
+		max_val = max(nums) + 1
+		while min_val + 1 < max_val:
+			mid = (min_val + max_val) // 2
+			cnt = sum(min_val <= num <= mid for num in nums)
+			if cnt > mid - min_val + 1:
+				max_val = mid + 1
+			else:
+				min_val = mid
+		return min_val
+
