@@ -22,7 +22,7 @@ class Solution2:
 		pre = [0] * 26
 		for i in range(n):
 			suf[ord(s[i]) - ord('a')] -= 1  # 维护后缀和
-			for j, a, b in zip(range(26), pre, suf):
+			for j, a, b in zip(range(26), pre, suf):  # 枚举前缀和后缀的组合，将O(n)优化到常数级O(26)
 				if a*b != 0:
 					ans.add(chr(j + 97) + s[i] + chr(j + 97))
 			pre[ord(s[i]) - ord('a')] += 1  # 维护前缀和

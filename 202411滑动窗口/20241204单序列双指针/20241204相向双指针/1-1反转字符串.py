@@ -22,8 +22,19 @@ class Solution2:
 			left += 1
 			right -= 1
 		return s
+	
+class Solution3:
+	def reverseString(self, s):
+		n = len(s)
+		left, right = 0, n - 1
+		while left < right:
+			s[left], s[right] = s[right], s[left]
+			left += 1
+			right -= 1
+		return s
+
 
 if __name__ == '__main__':
 	s = "hello"
-	cls = Solution2()
+	cls = Solution3()
 	print(cls.reverseString(list(s)))

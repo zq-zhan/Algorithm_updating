@@ -29,8 +29,21 @@ class Solution2:
 			right -= 1
 		return True
 
+class Solution3:
+	def isPalindrome(self, s):
+		left, right = 0, len(s) - 1
+		while left < right:
+			while not s[left].isalpha():
+				left += 1
+			while not s[right].isalpha():
+				right -= 1
+			if s[left].lower() != s[right].lower():
+				return False
+			left += 1
+			right -= 1
+		return True
 
 
 if __name__ == '__main__':
 	s = '.,'
-	print(Solution2().isPalindrome(s))
+	print(Solution3().isPalindrome(s))

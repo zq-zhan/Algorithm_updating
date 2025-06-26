@@ -47,8 +47,33 @@ class Solution2:
 					f[i + 1][j] = max(f[i][j], f[i][j - c] + 1)
 		ans = f[n][target]
 		return ans if ans > -1 else -1
+
+class Solution3:
+	def lengthOfLongestSubsequence(self, nums, target):
+		@cache
+		def dfs(i, c):
+			if i < 0:
+				return 0 if c == 0 else -inf
+			return max(dfs(i - 1, c - nums[i]) + 1, dfs(i - 1, c))
+		ans = dfs(len(nums) - 1, target)
+		return ans if ans > -inf else -1
+
+## 
+class Solution4:
+	def lengthOfLongestSubsequence(self, nums, target):
+		n = len(nums)
+		f = [[-inf] * (target + 1) for _ in range(n + 1)]
+		f[0][0] = 0
+		for i, x in enumerate(nums):
+			for c in range(target + 1):
+				if c < x:
+					f[i + 1][c] = f[i][c]
+				else:
+					f[i + 1][c] = max(f[i][c - x] + 1, f[i][c])
+		ans = f[-1][-1]
+		return ans if ans > -1 else -1
 	
 if __name__ == '__main__':
 	nums = [1,2,3,4,5]
 	target = 9
-	print(Solution2().lengthOfLongestSubsequence(nums, target)) # Output: 3
+	print(Solution4().lengthOfLongestSubsequence(nums, target)) # Output: 3

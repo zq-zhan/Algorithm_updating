@@ -69,8 +69,54 @@ class Solution4:
 		return max(ans, 0)
 	
 
+class Solution1:
+	def maximumCostSubstring(self, s, chars, vals):
+		ori_a = ord('a') - 1
+		chars_dic = defaultdict(int)
+		for i, x in enumerate(chars):
+			chars_dic[x] = vals[i]
+		@cache
+		def dfs(i):
+			if i < 0:
+				return 0
+			if s[i] in chars:
+				return max(dfs(i - 1), 0) + chars_dic[s[i]]
+			else:
+				return max(dfs(i - 1), 0) + ord(s[i]) - ori_a
+		n = len(s)
+		return max(dfs(x) for x in range(-1, n))
+## 递推写法
+class Solution2:
+	def maximumCostSubstring(self, s, chars, vals):
+		ori_a = ord('a') - 1
+		chars_dic = defaultdict(int)
+		for i, x in enumerate(chars):
+			chars_dic[x] = vals[i]
+		f0 = 0
+		ans = 0
+		for x in s:
+			temp_num = ord(x) - ori_a if x not in chars else chars_dic[x]
+			f0 = max(f0, 0) + temp_num
+			ans = max(ans, f0)
+		return ans
+## 前缀和写法
+class Solution3:
+	def maximumCostSubstring(self, s, chars, vals):
+		ori_a = ord('a') - 1
+		chars_dic = defaultdict(int)
+		for i, x in enumerate(chars):
+			chars_dic[x] = vals[i]
+		min_pre_sum = 0
+		ans = 0
+		temp_s = 0
+		for x in s:
+			temp_s += ord(x) - ori_a if x not in chars else chars_dic[x]
+			ans = max(ans, temp_s - min_pre_sum)
+			min_pre_sum = min(min_pre_sum, temp_s)
+		return ans
+
 if __name__ == '__main__':
 	s = "adaa"
 	chars = "d"
 	vals = [-1000]
-	print(Solution4().maximumCostSubstring(s, chars, vals))
+	print(Solution5().maximumCostSubstring(s, chars, vals))

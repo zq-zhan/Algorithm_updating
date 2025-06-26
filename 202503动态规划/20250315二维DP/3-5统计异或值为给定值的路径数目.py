@@ -48,7 +48,21 @@ class Solution3:
                     f[i + 1][j + 1][x] = (f[i + 1][j][x ^ val] + f[i][j + 1][x ^ val]) % MOD
         return f[m][n][k]
 	
+
+class Solution4:
+	def countPathsWithXorValue(self, grid, k):
+		n, m = len(grid), len(grid[0])
+		@cache
+		def dfs(i, j, c):
+			if i < 0 or j < 0:
+				return 0
+			elif i == 0 and j == 0:
+				return 1 if c == grid[0][0] ^ k else 0
+			c ^= grid[i][j]
+			return dfs(i - 1, j, c) + dfs(i, j - 1, c)
+		return dfs(n - 1, m - 1, 0)
+		
 if __name__ == '__main__':
 	grid = [[2, 1, 5], [7, 10, 0], [12, 6, 4]]
 	k = 11
-	print(Solution3().countPathsWithXorValue(grid, k))
+	print(Solution4().countPathsWithXorValue(grid, k))
