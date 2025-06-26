@@ -1,17 +1,20 @@
-# 2.长度为3的不同回文子序列
-# class Solution1:
-# 	def countPalindromicSubsequence(self, s):
-# 		ans = 0
-# 		n = len(s)
-# 		left_lis = [s[0]]
-# 		right_lis = [s[-1]]
-# 		for m in range(1, n - 1):
-# 			left_lis.append([left_lis[m-1] + [s[m]]])
-# 		for n in range(n - 2, 1, -1):
-# 			right_lis.append([right_lis[n+1] + [s[n]]])
+from collections import Counter
 
-# 		for j in range(1, n - 1):
-## 
+class Solution:
+	def countPalindromicSubsequence(self, s):
+		ans = set()
+		dic_k = Counter(s[1:])
+		pre = s[0]
+		for j in range(1, len(s) - 1):
+			if dic_k[s[j]] == 1:
+				del dic_k[s[j]]
+			else:
+				dic_k[s[j]] -= 1
+			for pre in s[:j]:
+				if pre in dic_k:
+					ans.add((pre, s[j], pre))
+		return len(ans)
+
 class Solution2:
 	def countPalindromicSubsequence(self, s):
 		n = len(s)
@@ -28,9 +31,6 @@ class Solution2:
 			pre[ord(s[i]) - ord('a')] += 1  # 维护前缀和
 		return len(ans)
 
-
-
 if __name__ == '__main__':
-	s = 'aabca'
-	cls = Solution2()
-	print(cls.countPalindromicSubsequence(s))
+	s = "ckafnafqo"
+	print(Solution().countPalindromicSubsequence(s))

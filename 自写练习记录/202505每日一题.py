@@ -586,13 +586,328 @@ class Solution:
 				v += 1
 		return ans
 
+# 20250610奇偶频次间的最大差值1
+class Solution:
+	def maxDifference(self, s):
+		s_dic = Counter(s)
+		mx = -inf
+		mn = inf
+		ans = 0
+		for val in s_dic.values():
+			if val % 2 == 1:
+				mx = max(mx, val)
+			else:
+				mn = min(mn, val)
+		return mx - mn
+# 20250611奇偶频次间的最大差值2
+class Solution:
+	def maxDifference(self, s, k):
+		dic_win = defaultdict(int)
+		ans = 0
+		for x in s:
+			dic_win[x] += 1
+			if 
 
+# 20250612循环数组中相邻元素的最大差值
+class Solution:
+	def maxAdjacentDistance(self, nums):
+		nums = nums + [nums[0]]
+		ans = 0
+		for i in range(1, len(nums)):
+			ans = max(ans, abs(nums[i] - nums[i - 1]))
+		return ans
 
+# 20250613最小化数对的最大差值
+class Solution:
+	def minimizeMax(self, nums, p):  # O(nk)
+		if 0 == p:
+			return 0
+		nums.sort()
+		max_diff = nums[-1] - nums[0]
+		
+		for diff in range(max_diff + 1):
+			i = cnt = 0
+			while i < len(nums) - 1:
+				if nums[i + 1] - nums[i] <= diff:
+					cnt += 1
+					if cnt == p:
+						return diff
+					i += 2
+				else:
+					i += 1
+## 灵神二分
+class Solution:
+	def minimizeMax(self, nums, p):
+		nums.sort()
+		def check(target):
+			cnt = i = 0
+			while i < len(nums) - 1:
+				if nums[i + 1] - nums[i] <= target:
+					cnt += 1
+					i += 2
+				else:
+					i += 1
+			return cnt >= p
 
+		left, right = -1, nums[-1] - nums[0]
+		while left + 1 < right:
+			mid = (left + right) // 2
+			if check(mid):
+				right = mid
+			else:
+				left = mid
+		return right
 
+# 20250616增量元素之间的最大差值
+class Solution:
+	def maximumDifference(self, nums):
+		ans = -1
+		mn = inf
+		for x in nums:
+			ans = max(ans, x - mn)
+			mn = min(mn, x)
+		return ans if ans > 0 else -1
 
+# 20250617统计有k个相等相邻元素的数组数目
+class Solution:
+	def countGoodArrays(self, n, m, k):
+		mod = 10 ** 9 + 7
+		ans = 0
+		for key in range(n):
+			cnt = m - k
+## 灵神思路
+class Solution:
+	def countGoodArrays(self, n, m, k):
+		mod = 10 **9 + 7
+		return comb(n - 1, k) % mod * m * pow(m - 1, n - k - 1, mod) % mod
 
+# 20250618划分数组并满足最大差限制
+class Solution:
+	def divideArray(self, nums, k):
+		nums.sort()
+		ans = []
+		temp_ans = []
+		for i in range(len(nums)):
+			temp_ans.append(nums[i])
+			if (i + 1) % 3 == 0:
+				if temp_ans[-1] - temp_ans[0] > k:
+					return []
+				ans.append(temp_ans)
+				temp_ans = []
+		return ans
 
+# 20250619划分数组使最大差为k
+class Solution:
+	def partitionArray(self, nums, k):
+		nums.sort()
+		# ans = 0
+		# pre_mn = nums[0]
+		# for i in range(1, len(nums)):
+		# 	if nums[i] - pre_mn <= k:
+		# 		continue
+		# 	else:
+		# 		pre_mn = nums[i]
+		# 		ans += 1
+		# return ans + 1
+		ans = left = 0
+		for right, x in enumerate(nums):
+			if x - nums[left] <= k:
+				continue
+			else:
+				left = right
+				ans += 1
+		return ans + 1
+
+# 20250620最大曼哈顿距离
+class Solution:
+	def maxDistance(self, s, k):
+		s = list(s)
+		s_dic = Counter(s)
+		if s_dic['N'] >= s_dic['S']:
+			flag_1 = True
+		if s_dic['W'] >= s_dic['W']:
+			flag_2 = True
+
+		result = ans = 0
+		for i, x in enumerate(s):
+			if x == 'N':
+				if flag_1:
+					ans += 1
+				else:
+					if k > 0:
+						s[i] = 'S'
+						k -= 1
+						ans += 1
+					else:
+						ans -= 1
+			elif x == 'S':
+				if flag_1:
+					if k > 0:
+						s[i] = 'N'
+						k -= 1
+						ans += 1
+					else:
+						ans -= 1
+				else:
+					ans += 1
+			elif x == 'W':
+				if flag_2:
+					ans += 1
+				else:
+					if k > 0:
+						s[i] = 'E'
+						k -= 1
+						ans += 1
+					else:
+						ans -= 1
+			elif x == 'E':
+				if flag_2:
+					if k > 0:
+						s[i] = 'W'
+						k -= 1
+						ans += 1
+					else:
+						ans -= 1
+				else:
+					ans += 1
+			result = max(result, ans)				
+		return result
+## 灵神题解1
+class Solution:
+	def maxDistance(self, s, k):
+		ans = 0
+		cnt = defaultdict(int)
+		for ch in s:
+			cnt[ch] += 1
+			left = k
+			def f(a, b):
+				nonlocal left
+				d = min(a, b, left)
+				left -= d
+				return abs(a - b) + 2 * d
+			ans = max(ans, f(cnt['N'], cnt['S']) + f(cnt['E'], cnt['W']))
+		return ans
+
+# 20250621成为k特殊字符串需要删除的最少字符数
+class Solution:
+	def minimumDeletions(self, word, k):
+		word_dic = Counter(word)
+		word_cnt_lis = sorted(list(cnt for cnt in word_dic.values()))
+		ans = left = 0
+		for right, c in enumerate(word_cnt_lis):
+			while abs(c - word_cnt_lis[left]) > k:
+				ans += word_cnt_lis[left]
+				left += 1
+		return ans
+## 灵神题解
+class Solution:
+    def minimumDeletions(self, word, k):
+        cnt = sorted(Counter(word).values())
+        max_save = 0
+        for i, base in enumerate(cnt):
+            s = sum(min(c, base + k) for c in cnt[i:])  # 至多保留 base+k 个
+            max_save = max(max_save, s)
+        return len(word) - max_save
+
+# 20250622将字符串拆分为若干长度为k的组
+class Solution:
+	def divideString(self, s, k, fill):
+		left = 0
+		ans = []
+		temp_s = ''
+		for right, x in enumerate(s):
+			temp_s += x
+			if right - left + 1 < k:
+				continue
+			ans.append(temp_s)
+			left = right + 1
+			temp_s = ''
+		if left < len(s):
+			ans.append(temp_s + fill * (k - right + left - 1))
+		return ans
+## 灵神题解
+class Solution:
+	def divideString(self, s, k, fill):
+		# n = len(s)
+		# return [s[i:i + k] + fill * (k - n + i) for i in range(0, n, k)]  # 复杂度为O(n // k) * O(k) = O(n)
+		## 先补全
+		while len(s) % k != 0:
+			s += fill
+		return [s[i:i + k] for i in range(0, len(s), k)]
+
+# 20250624找出数组中的所有k近邻下标
+class Solution:
+	def findKDistantIndices(self, nums, key, k):
+		ans = set()
+		n = len(nums)
+		for i in range(n):
+			if nums[i] == key:
+				start = max(0, i - k)
+				end = min(i + k, n - 1)
+				for j in range(start, end + 1):
+					ans.add(j)
+				if end >= n:
+					break
+		return list(ans)
+## 灵神题解
+class Solution:
+	def findKDistantIndices(self, nums, key, k):
+		last = -inf
+		for i in range(k - 1, -1, -1):
+			if nums[i] == key:
+				last = i
+				break
+
+		ans = []
+		n = len(nums)
+		for i in range(n):
+			if i + k < n and nusm[i + k] == key:
+				last = i + k
+			if last >= i - k:
+				ans.append(i)
+		return ans
+
+# 20250626小于等于k的最长二进制子序列
+## 灵神题解——贪心
+class Solution:
+	def longestSubsequence(self, s, k):
+		n, m = len(s), k.bit_length()
+		if n < m:
+			return n
+		ans = m if int(s[-m:], 2) <= k else m - 1  # int(s, 2)是将二进制转换为对应的十进制整数
+		return ans + s[:-m].count('0')
+## 贪心思路：所有0的个数+倒序后最大能取到的1的个数
+class Solution:
+	def longestSubsequence(self, s, k):
+		ans = s.count('0')
+		total = 0
+		for i, x in enumerate(s[::-1]):
+			if x == '1':
+				total += 1 << i
+				if total <= k:
+					ans += 1
+				else:
+					break
+		return ans
+
+## 子数组
+class Solution:
+	def longestSubsequence(self, s, k):
+		n, m = len(s), k.bit_length()
+		if n < m:
+			return n
+		ans = m - 1
+		left = 0
+		temp_s = ''
+		for right, x in enumerate(s):
+			temp_s += x
+			if right - left + 1 < m:
+				continue
+			while int(temp_s, 2) > k:
+				temp_s = temp_s[1:]
+				left += 1
+			ans = max(ans, right - left + 1)
+		return ans
 
 
 
