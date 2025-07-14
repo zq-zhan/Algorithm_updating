@@ -909,6 +909,63 @@ class Solution:
 			ans = max(ans, right - left + 1)
 		return ans
 
+# 20250628找到和最大的长度为k的子序列
+class Solution:
+	def maxSubsequence(self, nums, k):
+		target_s = Counter(sorted(nums)[-k:])
+		ans = []
+		for x in nums:
+			if target_s[x] > 0:
+				ans.append(x)
+				target_s[x] -= 1
+			if len(ans) == k:
+				break
+		return ans
+## 灵神题解
+class Solution:
+	def maxSubsequence(self, nums, k):
+		idx = sorted(range(len(nums)), key = lambda x:nums[x])
+		idx = sorted(idx[-k:])  # 取出前k大元素的下标，对下标再次排序
+		return [nums[i] for i in idx]
+## 最小堆模拟
+class Solution:
+	def maxSubsequence(self, nums, k):
+		heap = []
+		for i, num in enumerate(nums):
+			if len(heap) < k:
+				heapq.heappush(heap, (num, i))
+			else:
+				if num > heap[0][0]:
+					heapq.heappop(heap)
+					heapq.heappush(heap, (num, i))
+		heap.sort(key = lambda x:x[1])
+		return [num for num, i in heap]
+
+# 至多k次操作后的最长回文子序列
+class Solution:
+	def longestPalindromicSubsequence(self, s, k):
+		
+
+# 20250629满足条件的子序列数目
+class Solution:
+	def numSubseq(self, nums, target):
+		mod = 10 ** 9 + 7
+		nums.sort()
+		n = len(nums)
+		ans = 0
+		left, right = 0, n - 1
+		while left <= right:
+			if nums[left] + nums[right] > target:
+				right -= 1
+			else:
+				ans = (2 ** (right - left) + ans) % mod
+				left += 1
+		return ans
+
+
+
+
+
 
 
 

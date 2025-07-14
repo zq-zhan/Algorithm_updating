@@ -1364,6 +1364,174 @@ class Solution:
 		return k
 
 
+###################### 栈 ##################
+# 1.用栈操作构建数组
+class Solution:
+	def buildArray(self, target, n):
+		ans = []
+		temp_ans = []
+		for i in range(1, n + 1):
+			if i in target:
+				temp_ans.append(i)
+				ans.append('Push')
+			else:
+				if target == temp_ans:
+					break
+				else:
+					ans.append('Push')
+					ans.append('Pop')
+		return ans
+## 优化
+class Solution:
+	def buildArray(self, target, n):
+		ans = []
+		max_num = min(n + 1, target[-1] + 1)
+		for i in range(1, max_num):
+			if i in target:
+				ans.append('Push')
+			else:
+				ans.extend(['Push', 'Pop'])
+		return ans
+
+# 2.比较含退格的字符串
+class Solution:
+	def backspaceCompare(self,s,t):
+		n = len(s)
+		m = len(t)
+		p1, p2 = n-1 ,m-1
+		cnt1 = 0
+		cnt2 = 0
+		while p1 >= 0 or p2 >= 0:
+			while p1 >= 0:
+				if s[p1] == '#':
+					cnt1 += 1
+					p1 -= 1
+				elif cnt1 > 0:
+					cnt1 -= 1
+					p1 -= 1
+				else:
+					break
+			while p2 >= 0:
+				if t[p2] == '#':
+					cnt2 += 1
+					p2 -= 1
+				elif cnt2 > 0:
+					cnt2 -= 1
+					p2 -= 1
+				else:
+					break
+			if p1 >= 0 and p2 >= 0:
+				if s[p1] != t[p2]:
+					return False
+			elif p1 >=0 or p2 >= 0:
+				return False
+			p1 -= 1
+			p2 -= 1
+		return True
+## 栈解法
+class Solution:
+	def backspaceCompare(self, s, t):
+		def trans(substr):
+			s_lis = []
+			for x in substr:
+				if x != '#':
+					s_lis.append(x)
+				elif len(s_lis) > 0:
+					s_lis.pop()
+			return s_lis
+		return trans(s) == trans(t)
+
+# 3.棒球比赛
+class Solution:
+	def calPoints(self, opt):
+		# def check(num):
+		# 	try:
+		# 		float(num)
+		# 		return True
+		# 	except ValueError:
+		# 		return False
+		ans = []
+		for x in opt:
+			if x == '+':
+				ans.append(ans[-1] + ans[-2])
+			elif x == 'D':
+				ans.append(ans[-1] * 2)
+			elif x == 'C':
+				ans.pop()
+			else:
+				ans.append(int(x))
+		return sum(ans)
+
+# 4.从字符串中移除星号
+class Solution:
+	def removeStars(self, s):
+		ans = []
+		for x in s:
+			if x == '*':
+				ans.pop()
+			else:
+				ans.append(x)
+		return ''.join(ans)
+
+# 5.设计浏览器历史记录
+class BrowserHistory:
+
+    def __init__(self, homepage):
+        
+
+    def visit(self, url: str) -> None:
+        
+
+    def back(self, steps: int) -> str:
+        
+
+    def forward(self, steps: int) -> str:
+
+# 6.验证栈序列
+class Solution:
+	def validateStackSequences(self, pushed, poped):
+		ans = []
+		p1 = 0
+		for x in pushed:
+			if x != poped[p1]:
+				ans.append(x)
+			else:
+				p1 += 1
+			while ans and ans[-1] == poped[p1]:
+				ans.pop()
+				p1 += 1
+		return not ans
+
+# 7.计算字符串的镜像分数
+class Solution:
+	def calculateScore(self, s):
+		ans = 0
+		ans_dic = defaultdict(list)
+		for i, x in enumerate(s):
+			position = ord(x) - ord('a')
+			mirror_position = 26 - position - 1
+			trans_char = chr(ord('a') + mirror_position)
+			if trans_char not in ans_dic:
+				ans_dic[x].append(i)
+			else:
+				ans += i - ans_dic[trans_char][-1]
+				if len(ans_dic[trans_char]) == 1:
+					del ans_dic[trans_char]
+				else:
+					ans_dic[trans_char].pop()
+		return ans
+## 灵神题解
+class Solution:
+	def calculateScore(self, s):
+		ans = 0
+		stk = [[] for _ in range(26)]
+		for i, x in enumerate(map(ord, s)):
+			x -= ord('a')
+			if stk[25 - x]:
+				ans += i - stk[25 - x].pop()
+			else:
+				stk[x].append(i)
+		return ans
 
 
 

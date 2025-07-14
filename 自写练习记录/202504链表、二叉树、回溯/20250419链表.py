@@ -543,7 +543,7 @@ class Solution1:
 		return head
 
 # 2.对链表进行插入排序
-class Solution1:
+class Solution1:  # 错解
 	def insertionSortList(self, head):
 		p0 = dummy = ListNode(next = head)
 		cur = p0.next
