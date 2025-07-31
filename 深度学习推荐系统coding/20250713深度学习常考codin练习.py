@@ -19,7 +19,7 @@ def data_iter(batch_size, feature, labels):
 	for i in range(0, num_examples, batch_size):
 		batch_indices = torch.tensor(
 			indices[i:min(i + batch_size, num_examples)])
-		yield features[batch_indices], labels[batch_indices]
+		yield feature[batch_indices], labels[batch_indices]
 # 3.定义模型
 def linreg(X, w, b):
 	return torch.matual(X, w) + b

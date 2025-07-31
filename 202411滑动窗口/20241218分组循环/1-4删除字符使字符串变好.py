@@ -47,6 +47,19 @@ class Solution2:
                 i += 1
         return "".join(ans)
 
+class Solution:
+	def makeFancyString(self, s):
+		n = len(s)
+		s += '0'
+		ans = temp_s = ''
+		for i in range(n):
+			temp_s += s[i]
+			if s[i] == s[i + 1]:
+				continue
+			ans += temp_s[:2]
+			temp_s = ''
+		return ans
+
 if __name__ == '__main__':
 	s = "leeetcode"
 	cls = Solution2()

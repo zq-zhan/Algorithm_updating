@@ -1230,3 +1230,1692 @@ class Solution:
 			ans += str(head.val)
 			head = head.next
 		return int(ans, 2)
+
+# 60.从叶节点开始的最小字符串
+class Solution:
+	def smallestFromLeaf(self, root):
+		ans = 'z' * 8500
+		ord_a = ord('a')
+		def dfs(root, temp_str):
+			nonlocal ans
+			if not root:
+				return 
+			temp_str = chr(root.val + ord_a) + temp_str
+			if not root.left and not root.right:
+				if temp_str < ans:
+					ans = temp_str
+			dfs(root.left, temp_str)
+			dfs(root.right, temp_str)
+		dfs(root, '')
+		return ans
+
+# 61.节点与其祖先之间的最大差值
+class Solution:
+	def maxAncestorDiff(self, root):
+		ans = 0
+		def dfs(root, mx_pre, mn_pre):
+			nonlocal ans
+			if not root:
+				return 
+			ans = max(ans, abs(root.val - mx_pre), abs(root.val - mn_pre))
+			mx_pre = max(mx_pre, root.val)
+			mn_pre = min(mn_pre, root.val)
+			dfs(root.left, mx_pre, mn_pre)
+			dfs(root.right, mx_pre, mn_pre)
+		dfs(root, root.val, root.val)
+		return ans
+## 自底向上写法——错解法
+class Solution:
+	def maxAncestorDiff(self, root, ans=0, mx_pre=root.val, mn_pre=root.val):
+		if not root:
+			return ans
+		ans = max(ans, abs(ans - mx_pre), abs(ans - mn_pre))
+		mx_pre = max(mx_pre, root.val)
+		mn_pre = min(mn_pre, root.val)
+		left = self.maxAncestorDiff(root.left, ans, mx_pre, mn_pre)
+		right = self.maxAncestorDiff(root.right, ans, mx_pre, mn_pre)
+		return max(left, right)
+## 自底向上——归
+class Solution:
+	def maxAncestorDiff(self, root):
+		ans = 0
+		def dfs(node):
+			if not node:
+				return inf, -inf
+			l_mn, l_mx = dfs(node.left)
+			r_mn, r_mx = dfs(node.right)
+			mn = min(node.val, l_mn, r_mn)
+			mx = max(node.val, l_mx, r_mx)
+			nonlocal ans
+			ans = max(ans, node.val - mn, mx - node.val)
+			return mn, mx
+		dfs(root)
+		return ans
+
+
+# 62.从根到叶的二进制数之和
+class Solution:
+	def sumRootToLeaf(self, root):
+		ans = 0
+		def dfs(root, temp_str):
+			nonlocal ans
+			if not root:
+				return
+			temp_str += str(root.val)
+			if not root.left and not root.right:
+				ans += int(temp_str, 2)
+			dfs(root.left, temp_str)
+			dfs(root.right, temp_str)
+		dfs(root, '')
+		return ans
+
+################### 自底向上dfs ###################
+# 63.平衡二叉树
+class Solution:
+	def isBalanced(self, root):
+		def get_height(node):
+			if not node:
+				return 0
+			left_height = get_height(node.left)
+			if left_height == -1:
+				return -1
+			right_height = get_height(node.right)
+			if right_height == -1 or abs(left_height - right_height) > 1:
+				return -1
+			return max(left_height, right_height) + 1
+		return get_height(root) != -1
+
+# 64.二叉树的最大深度
+class Solution:
+	def maxDepth(self, root):
+		if not root:
+			return 0
+		return max(self.maxDepth(root.left), self.maxDepth(root.right)) + 1
+
+# 65.二叉树的最小深度
+## 灵神题解-自底向上遍历
+class Solution:
+	def minDepth(self, root):
+		if not root:
+			return 0
+		elif not root.left and not root.right:  # 与最大深度不同，必须要求叶节点
+			return 1
+
+		l_depth = self.minDepth(root.left) if root.left else inf
+		r_depth = self.minDepth(root.right) if root.right else inf
+		return min(l_depth, r_depth) + 1
+## 自顶向下遍历
+class Solution:
+	def minDepth(self, root):
+		ans = inf
+		def dfs(root, depth):
+			nonlocal ans
+			if not root:
+				return 
+			depth += 1
+			if depth >= ans:
+				return 
+			if not root.left and not root.right:
+				ans = min(ans, depth)
+				return 
+			dfs(root.left, depth)
+			dfs(root.right, depth)
+		dfs(root, 0)
+		return ans if root else 0
+
+# 66.20250715有效单词
+class Solution:
+	def isValid(self, word):
+		cnt1 = cnt2 = 0   # 记录元音字母个数
+		if len(word) < 3:
+			return False
+		for x in word:
+			if not x.isdigit() and not x.isalpha():
+				return False
+			if x.isalpha():
+				if x in 'aeiouAEIOU':
+					cnt1 += 1
+				else:
+					cnt2 += 1
+		return True if cnt1 > 0 and cnt2 > 0 else False
+## 灵神题解——巧妙用元音和辅音的判断
+class Solution:
+	def isValid(self, word):
+		if len(word) < 3:
+			return False
+		f = [False] * 2
+		for c in word:
+			if c.isalpha():
+				f[c.lower() in "aeiou"] = True
+			elif not c.isdigit():
+				return False
+		return all(f)
+
+# 67.单值二叉树
+class Solution:
+	def isUnivalTree(self, root, set_lis = set()):
+		if not root:
+			return len(set_lis) == 1
+		if len(set_lis) > 1:
+			return False
+		set_lis.add(root.val)
+		left = self.isUnivalTree(root.left, set_lis)
+		right = self.isUnivalTree(root.right, set_lis)
+		return left and right
+class Solution:
+	def isUnivalTree(self, root, dic_win = defaultdict(int)):
+		if not root:
+			return len(dic_win) == 1
+		if len(dic_win) > 1:
+			return False
+		dic_win[root.val] += 1
+		left = self.isUnivalTree(root.left, dic_win)
+		right = self.isUnivalTree(root.right, dic_win)
+		if dic_win[root.val] == 1:
+			del dic_win[root.val]
+		else:
+			dic_win[root.val] += 1
+		return left and right
+class Solution:
+	def isUnivalTree(self, root):
+		v = root.val
+		def dfs(node):
+			return not node or (node.val == v and dfs(node.left) and dfs(node.right))
+		return dfs(root)
+class Solution:
+	def isUnivalTree(self, root):
+		if not root:
+			return True
+		if root.left and root.left.val != root.val:
+			return False
+		if root.right and root.right.val != root.val:
+			return False
+		return self.isUnivalTree(root.left) and self.isUnivalTree(root.right)
+## 自顶向下
+class Solution:
+	def isUnivalTree(self, root):
+		ans_set = set()
+		def dfs(root):
+			if not root:
+				return
+			ans_set.add(root.val)
+			dfs(root.left)
+			dfs(root.right)
+		dfs(root)
+		return len(ans_set) <= 1
+
+# 68.相同的树
+class Solution:
+	def isSameTree(self, p, q):
+		if not p and not q:
+			return True
+		elif (not p and q) or (p and not q) or (p.val != q.val):
+			return False
+		left = self.isSameTree(p.left, q.left)
+		right = self.isSameTree(p.right, q.right)
+		return left and right
+## 灵神题解——简洁
+class Solution:
+	def isSameTree(self, p, q):
+		if not p or not q:
+			return p is q  # 都得是None
+		return p.val == q.val and self.isSameTree(p.left, q.left) and self.isSameTree(p.right, q.right)
+
+# 69.对称二叉树
+class Solution:
+	def isSameTree(self, p, q):
+		if not p or not q:
+			return p is q  # 都得是None
+		return p.val == q.val and self.isSameTree(p.left, q.right) and self.isSameTree(p.right, q.left)
+
+	def isSymmetric(self, root):
+		return self.isSameTree(root.left, root.right)
+
+
+# 70.找出有效子序列的最大长度1
+class Solution:
+	def maximumLength(self, nums):
+		ans = 0
+		n = len(nums)
+		def dfs(i, pre_num):
+			if nums[i]
+
+# 71.翻转等价二叉树
+class Solution:
+	def maximumLength(self, root1, root2):
+		if not root1 or not root2:
+			return root1 is root2
+		if root1.val == root2.val:
+			return (self.maximumLength(root1.left, root2.left) and self.maximumLength(root1.right, root2.right)) \
+			or (self.maximumLength(root1.left, root2.right) and self.maximumLength(root1.right, root2.left))
+		else:
+			return False
+		return self.maximumLength(root1, root2)
+
+# 72.找出克隆二叉树中的相同节点
+class Solution:
+	def getTargetCopy(self, original, cloned, target):
+		ans = ''
+		def dfs(cloned):
+			if not cloned:
+				return
+			elif cloned.val == target.val:
+				nonlocal ans
+				ans = cloned
+				return
+			dfs(cloned.left)
+			dfs(cloned.right)
+		dfs(cloned)
+		return ans
+## 灵神题解
+class Solution:
+	def getTargetCopy(self, original, cloned, target):
+		if original is None or original is target:
+			return cloned
+		return self.getTargetCopy(original.left, cloned.left, target) or \
+			self.getTargetCopy(original.right, cloned.right, target)
+
+# 73.平衡二叉树
+## 后序遍历+剪枝
+class Solution:
+	def isBalanced(self, root):
+		def get_height(node):
+			if not node:
+				return 0
+			left_height = get_height(node.left)
+			if left_height == -1:
+				return -1
+			right_height = get_height(node.right)
+			if right_height == -1 or abs(left_height - right_height) > 1:
+				return -1
+			return max(left_height, right_height) + 1
+		return get_height(root) != 1
+## 先序遍历+判断深度
+class Solution:
+	def isBalanced(self, root):
+		if not root:
+			return True
+		return abs(self.depth(root.left) - self.depth(root.right)) <= 1 and \
+			self.isBalanced(root.left) and self.isBalanced(root.right)
+
+	def depth(self, root):
+		if not root:
+			return 0
+		return max(self.depth(root.left), self.depth(root.right)) + 1
+
+# 74.翻转二叉树
+class Solution:
+	def invertTree(self, root):
+		if not root:
+			return root
+		def chans(node1, node2):
+			if not node1 or not node2:
+				return
+			node1.val, node2.val = node2.val, node1.val
+			chans(node1.left, node2.left)
+			chans(node1.right, node2.right)
+		chans(root.left, root.right)
+		return root
+
+class Solution:
+	def invertTree(self, root):
+		if not root:
+			return root
+
+		def chans(node):
+			if not node:
+				return 
+			node.left.val, node.right.val = node.right.val, node.left.val
+## 灵神题解
+### 自底向上
+class Solution:
+	def invertTree(self, root):
+		if not root:
+			return None
+		left = self.invertTree(root.left)
+		right = self.isUnivalTree(root.right)
+		root.left = right
+		root.right = left
+		return root
+### 自上向下
+class Solution:
+	def invertTree(self, root):
+		if not root:
+			return None
+		root.left, root.right = root.right, root.left
+		self.invertTree(root.left)
+		self.invertTree(root.right)
+		return root
+
+# 75.合并二叉树
+class Solution:
+	def mergeTrees(self, root1, root2):
+		if not root1 and not root2:
+			return None
+		if not root1:
+			return root2
+			# 当这里写成root1 = root2时，赋值改变的是局部变量，不回传递回上层，所以root1.left还是会报错
+		if not root2:
+			return root1
+		# 下面是root1和root2都存在的情况
+		root1.val += root2.val
+		left = self.mergeTrees(root1.left, root2.left)
+		right = self.mergeTrees(root1.right, root2.right)
+		root1.left = left
+		root1.right = right
+		return root1
+
+# 76.计算布尔二叉树的值
+class Solution:
+	def evaluateTree(self, root):
+		if not root.left and not root.right:
+			# return True if root.val else False
+			return bool(root.val)
+		left = self.evaluateTree(root.left)
+		right = self.evaluateTree(root.right)
+		if root.val == 2:
+			return left or right
+		else:
+			return left and right
+
+# 77.出现次数最多的子树元素和
+class Solution:
+	def findFrequentTreeSum(self, root):
+		if not root.left and not root.right:
+			return [root.val]
+		dic_win = defaultdict(int)
+		def get_sum(root):
+			if not root:
+				return 0
+			# if not root.left and not root.right:
+			# 	return root.val
+			left = get_sum(root.left)
+			if left != 0:
+				dic_win[left] += 1
+			right = get_sum(root.right)
+			if right != 0:
+				dic_win[right] += 1
+			dic_win[left + right + root.val] += 1
+		get_sum(root)
+		mx_cnt = max(cnt for _, cnt in dic_win.items())
+		ans = []
+		for key, val in dic_win.items():
+			if val == mx_cnt:
+				ans.append(key)
+		return ans
+class Solution:
+	def findFrequentTreeSum(self, root):
+		if not root:
+			return []
+
+		dic_win = defaultdict(int)
+		def get_sum(node):
+			if not node:
+				return 0
+			left = get_sum(node.left)
+			right = get_sum(node.right)
+			curr_sum = left + right + node.val
+			dic_win[curr_sum] += 1
+			return curr_sum
+		get_sum(root)
+		mx_cnt = max(dic_win.values())
+		return [s for s, cnt in dic_win.items() if cnt == mx_cnt]
+
+# 78.删除子文件夹
+class Solution:
+	def removeSubfolders(self, folder):
+		folder.sort(key = lambda x:len(x))
+		set_win = set()
+		ans = []
+		for i, file_path in enumerate(folder):
+			tag = False
+			for path in set_win:
+				n = len(path)
+				if path in file_path and file_path[:n] == path and file_path[n] == '/':
+					tag = True
+					break
+			if not tag:
+				ans.append(i)
+				set_win.add(file_path)
+		return [folder[i] for i in ans]
+## 灵神思路
+'''按字典序排序后只需要与上一个未被删除的路径比较即可'''
+class Solution:
+	def removeSubfolders(self, folder):
+		folder.sort()
+		ans = [folder[0]]
+		for s in folder[1:]:
+			last = ans[-1]
+			if not s.startswith(last) or s[len(last)] != '/':
+				ans.append(s)
+		return ans
+
+# 79.二叉树的坡度
+class Solution:
+	def findTilt(self, root):
+		ans = 0
+		def dfs(node):
+			nonlocal ans
+			if not node:
+				return 0
+			if not node.left and not node.right:
+				return node.val
+			left = dfs(node.left)
+			right = dfs(node.right)
+			ans += abs(left - right)
+			return left + right + node.val
+		dfs(root)
+		return ans
+
+# 80.根据二叉树创建字符串
+class Solution:
+	def tree2str(self, root):
+		ans = ''
+		def dfs(node):
+			nonlocal ans
+			if not node:
+				return
+			ans += str(node.val) + '('
+			dfs(node.left)
+			dfs(node.right)
+			ans += ')'
+		dfs(root)
+		result = []
+		for i in range(1, len(ans)):
+			if ans[i] == ')' and result[-1] == '(':
+				result.pop()
+			else:
+				result.append(ans[i])
+		return ''.join(result)
+
+# 81.统计值等于子树平均值的节点数
+class Solution:
+	def averageOfSubtree(self, root):
+		ans = 0
+		def dfs(node):
+			if not node:
+				return (0, 0)
+			left_sum, left_cnt = dfs(node.left)
+			right_sum, right_cnt = dfs(node.right)
+
+			total_sum = left_sum + right_sum + node.val
+			total_cnt = left_cnt + right_cnt + 1
+			avg = total_sum // total_cnt
+			nonlocal ans
+			ans += int(node.val == avg)
+			return (total_sum, total_cnt)
+		dfs(root)
+		return ans
+
+# 72.第k大的完美二叉子树的大小
+class Solution:  # 错解
+	def kthLargestPerfectSubtree(self, root, k):
+		ans = []
+		def dfs(node):
+			if not node:
+				return 0, 0
+			if node.left and node.right:
+				tag = True
+			else:
+				tag = False
+			l_depth, l_cnt = dfs(node.left)
+			r_depth, r_cnt = dfs(node.right)
+			if tag and l_depth == r_depth:
+				ans.append(l_cnt + r_cnt + 1)
+			return max(l_depth, r_depth) + 1, l_cnt + r_cnt + 1
+		dfs(root)
+		ans.sort()
+		return ans[-k] if len(ans) >= k else -1
+## 正确题解
+class Solution:
+	def kthLargestPerfectSubtree(self, root, k):
+		ans = []
+		def dfs(node):
+			if not node:
+				return True, 0, 0
+			l_tag, l_depth, l_cnt = dfs(node.left)
+			r_tag, r_depth, r_cnt = dfs(node.right)
+			is_tag = l_tag and r_tag and l_depth == r_depth
+
+			size = l_cnt + r_cnt + 1
+			depth = max(l_depth, r_depth) + 1
+			if is_tag:
+				ans.append(size)
+			return is_tag, depth, size
+		dfs(root)
+		ans.sort()
+		return ans[-k] if len(ans) >= k else -1
+## 灵神思路
+class Solution:
+    def kthLargestPerfectSubtree(self, root: Optional[TreeNode], k: int) -> int:
+        hs = []
+        def dfs(node: Optional[TreeNode]) -> int:
+            if node is None:
+                return 0
+            left_h = dfs(node.left)
+            right_h = dfs(node.right)
+            if left_h < 0 or left_h != right_h:
+                return -1  # 不合法
+            hs.append(2 ** (left_h + 1) - 1)
+            return left_h + 1
+        dfs(root)
+
+        if k > len(hs):
+            return -1
+        hs.sort()
+        return hs[-k] if len(hs) >= k else -1
+
+# 73.打折购买糖果的最小开销
+class Solution:
+	def minimumCost(self, cost):
+		ans = 0
+		temp_lis = []
+		cost.sort(reverse = True)
+		for i in range(len(cost)):
+			if len(temp_lis) >= 2 and temp_lis[-1] >= cost[i]:
+				temp_lis = []
+				continue
+			temp_lis.append(cost[i])
+			ans += cost[i]
+		return ans
+
+# 74.分裂二叉树的最大乘积
+class Solution:
+	def maxProduct(self, root):
+		total_s = 0
+		mod = 10 ** 9 + 7
+		def dfs(node):
+			if not node:
+				return
+			nonlocal total_s
+			total_s += node.val
+			dfs(node.left)
+			dfs(node.right)
+		dfs(root)
+
+		ans = 0
+		def sub_dfs(node):
+			if not node:
+				return 0
+			left = sub_dfs(node.left)
+			right = sub_dfs(node.right)
+			nonlocal ans
+			temp_s = left + right + node.val
+			ans = max(ans, (total_s-temp_s) * temp_s)
+			return left + right + node.val
+		sub_dfs(root)
+		return ans % mod
+
+# 75.二叉树剪枝
+class Solution:
+	def pruneTree(self, root):
+		def dfs(node):
+			if not node:
+				return None
+			node.left = dfs(node.left)
+			node.right = dfs(node.right)
+			if node.val == 0 and not node.left and not node.right:
+				return None
+			return node
+		return dfs(root)  # 这个返回值才是真正剪枝后的新根节点
+		# dfs(root)
+		# return root  # 这样的话仍然返回原始root的根节点，当剪枝后是None就错了
+
+# 76.删除给定值的叶子节点
+class Solution:
+	def removeLeafNodes(self, root, target):
+		def dfs(node):
+			if not node:
+				return None
+			node.left = dfs(node.left)
+			node.right = dfs(node.right)
+			if not node.left and not node.right and node.val == target:
+				return None
+			return node
+		return dfs(root)
+
+# 77.删点成林
+class Solution:
+	def delNodes(self, root, to_delete):
+		ans = []
+		to_delete = set(to_delete)
+		def dfs(node):
+			if not node:
+				return None
+			node.left = dfs(node.left)
+			node.right = dfs(node.right)
+			if node.val in to_delete:
+				if node.left:
+					ans.append(node.left)
+				if node.right:
+					ans.append(node.right)
+				return None
+			return node
+		root = dfs(root)
+		if root:
+			ans.append(root)
+		return ans
+
+# 78.删除字符使字符串变好
+class Solution:
+	def makeFancyString(self, s):
+		n = len(s)
+		s += '0'
+		ans = temp_s = ''
+		for i in range(n):
+			temp_s += s[i]
+			if s[i] == s[i + 1]:
+				continue
+			ans += temp_s[:2]
+			temp_s = ''
+		return ans
+## 灵神题解——用cnt计数
+class Solution:
+	def makeFancyString(self, s):
+		ans = []
+		cnt = 0
+		for i, x in enumerate(s):
+			cnt += 1
+			if cnt < 3:
+				ans.append(x)
+			if i < len(s) - 1 and x != s[i + 1]:
+				cnt = 0
+		return ''.join(ans)
+
+# 79.二叉树的直径
+class Solution:
+	def diameterOfBinaryTree(self, root):
+		ans = 0
+		def dfs(node):
+			if not node:
+				return -1
+			left = dfs(node.left)
+			right = dfs(node.right)
+			nonlocal ans
+			ans = max(ans, left + right + 2)  # 以当前节点为中间节点的最长直径
+			return max(left, right) + 1  # 以当前节点为根的子树的最长链
+		dfs(root)
+		return ans
+
+# 80.最长同值路径
+class Solution:  # 错解
+	def longestUnivaluePath(self, root):
+		ans = 0
+		def dfs(node):
+			if not node:
+				return -1
+			if not node.left and not node.right:
+				return 0
+			left = dfs(node.left)
+			right = dfs(node.right)
+			nonlocal ans
+			if node.left and node.val != node.left:
+				ans = max(ans, right + 1)
+				return right + 1
+			elif node.right and node.val != node.right:
+				ans = max(ans, left + 1)
+				return left + 1
+			else:
+				ans = max(ans, left + right + 2)
+				return max(left, right) + 1
+		dfs(root)
+		return ans
+class Solution:  
+	def longestUnivaluePath(self, root):
+		ans = 0
+		def dfs(node):
+			if not node:
+				return 0
+			left_len = dfs(node.left)  # 一定要先递归再判断！！！
+			right_len = dfs(node.right)
+
+			left_path = right_path = 0
+			if node.left and node.left.val == node.val:
+				left_path = left_len + 1
+			if node.right and node.right.val == node.val:
+				right_path = right_len + 1
+
+			nonlocal ans
+			ans = max(ans, left_path + right_path)
+			return max(left_path, right_path)  # 返回父节点最长单边路径
+		dfs(root)
+		return ans
+
+# 81.二叉树中的最大路径和
+class Solution:
+	def maxPathSum(self, root):
+		ans = -inf
+		def dfs(node):
+			if not node:
+				return 0
+			left = max(dfs(node.left), 0)  # 左子树和为负数时就剪枝
+			right = max(dfs(node.right), 0)
+			nonlocal ans
+			ans = max(ans, left + right + node.val)
+			return max(left, right) + node.val
+		dfs(root)
+		return ans
+
+# 82.二叉树的所有路径
+class Solution:
+	def binaryTreePaths(self, root):
+		ans = []
+		def dfs(node, temp_s):
+			if not node:
+				return
+			temp_s += str(node.val) + '->'
+			if not node.left and not node.right:
+				temp_s = temp_s[:-2]
+				ans.append(temp_s)
+				return
+			dfs(node.left, temp_s)
+			dfs(node.right, temp_s)
+		dfs(root, '')
+		return ans
+## 灵神思路——回溯
+class Solution:
+	def binaryTreePaths(self, root):
+		ans = []
+		path = []
+		def dfs(node):
+			if not node:
+				return 
+			path.append(node.val)
+			if not node.left and not node.right:
+				ans.append('->'.join(path))
+				# return
+			dfs(node.left)
+			dfs(node.right)
+			path.pop()
+		dfs(root)
+		return ans
+			
+# 83.删除子数组的最大得分
+class Solution:
+	def maximumUniqueSubarray(self, nums):
+		set_win = set()
+		ans = temp_s = left = 0
+		for right, x in enumerate(nums):
+			temp_s += x
+			while x in set_win:
+				set_win.remove(nums[left])
+				temp_s -= nums[left]
+				left += 1
+			set_win.add(x)
+			ans = max(ans, temp_s)
+		return ans
+
+# 84.路径总和2
+class Solution:
+	def pathSum(self, root, targetSum):
+		ans = []
+		path = []
+		def dfs(node):
+			if not node:
+				return 
+			path.append(node.val)
+			if not node.left and not node.right and sum(path) == targetSum:
+				ans.append(path.copy())
+			else:
+				dfs(node.left)
+				dfs(node.right)
+			path.pop()
+		dfs(root)
+		return ans
+
+# 85.路径总和3
+class Solution:
+	def pathSum(self, root, targetSum):
+		ans = 0
+		path = [0]
+		def dfs(node):
+			nonlocal ans 
+			if not node:
+				pre_s_dic = Counter(pre_s)
+				for x in pre_s:
+					pre_s_dic[x] -= 1
+					ans += pre_s_dic[x + targetSum]
+					# pre_s_dic[x] += 1
+				return
+			path.append(node.val + path[-1])
+			dfs(node.left)
+			dfs(node.right)
+			path.pop()
+		dfs(root)
+		return ans
+## 上面错解的修改
+class Solution:
+    def pathSum(self, root, targetSum):
+        self.ans = 0
+        path = [0]  # 初始前缀和为0（模拟从根之前的空路径）
+
+        def dfs(node):
+            if not node:
+                return
+
+            # 当前路径和 = 父路径和 + 当前值
+            curr_sum = path[-1] + node.val
+            path.append(curr_sum)
+
+            # 枚举前缀，判断是否有 curr_sum - old_sum == targetSum
+            for pre_sum in path[:-1]:  # 排除当前的自己
+                if curr_sum - pre_sum == targetSum:
+                    self.ans += 1
+
+            # 递归左右子树
+            dfs(node.left)
+            dfs(node.right)
+
+            path.pop()  # 回溯
+
+        dfs(root)
+        return self.ans
+
+## 灵神题解
+class Solution:
+	def pathSum(self, root, targetSum):
+		ans = 0
+		cnt = defaultdict(int)
+		cnt[0] = 1
+		def dfs(node, s):
+			if not node:
+				return
+			nonlocal ans
+			s += node.val  # 把node当作路径的终点，统计有多少个起点
+			ans += cnt[s - targetSum]
+			cnt[s] += 1  # 注意顺序，排除当前的s
+			dfs(node.left, s)
+			dfs(node.right, s)
+			cnt[s] -= 1
+		dfs(root, 0)
+		return ans
+
+# 86.删除子字符串的最大得分
+## 思路一：贪心+两次栈
+class Solution:
+	def maximumGain(self, s, x, y):
+		def remove_pair(s, first, second, score):
+			stack = []
+			total = 0
+			for c in s:
+				if stack and stack[-1] == first and c == second:
+					stack.pop()
+					total += score
+				else:
+					stack.append(c)
+			return ''.join(stack), total
+
+		ans = 0
+
+# 87.二叉树的最近公共祖先
+class Solution:
+	def lowestCommonAncestor(self, root, p, q):
+		 if not root or root is p or root is q:
+		 	return root
+		 left = self.lowestCommonAncestor(root.left, p, q)
+		 right = self.lowestCommonAncestor(root.right, p, q)
+		 if left and right:
+		 	return root
+		 if left:
+		 	return left
+		 return right
+
+# 88.二叉搜索的最近公共祖先
+class Solution:
+	def lowestCommonAncestor(self, root, p, q):
+		x = root.val
+		if p.val < x and q.val < x:
+			return self.lowestCommonAncestor(root.left, p, q)
+		if p.val > x and q.val > x:
+			return self.lowestCommonAncestor(root.right)
+		return root
+
+# 89.电话号码的字母组合
+class Solution:  # O(n4^n)
+	def letterCombinations(self, digits):
+		n = len(digits)
+		if n == 0:
+			return []
+
+		mapping = ['', '', 'abc', 'def', 'ghi', 'jkl', 'mno', 'pqrs', 'tuv', 'wxyz']
+		ans = []
+		path = [''] * n
+		def dfs(i):
+			if i == n:
+				ans.append(''.join(path))
+				return 
+			for c in mapping[int(digits[i])]:
+				path[i] = c
+				dfs(i + 1)
+		dfs(0)
+		return ans
+
+# 90.子集
+class Solution:  # O(n2^n)
+	def subsets(self, nums):
+		n = len(nums)
+
+		ans = []
+		path = []
+		def dfs(i):
+			if i == n:
+				ans.append(path.copy())  # 列表复制的复杂度是O(n)
+				return
+
+			dfs(i + 1)  # 不选的情况，这里因为本身就没有改变路径结构，所以不需要回溯，不必ifelse区分场景分别回溯
+
+			path.append(nums[i])
+			dfs(i + 1)  # 选的情况
+			path.pop()
+		dfs(0)
+		return ans
+
+# 91.找出所有子集的异或总和再求和
+class Solution:
+	def subsetXORSum(self, nums):
+		n = len(nums)
+		ans = path = 0
+		def dfs(i):
+			nonlocal ans, path
+			if i == n:
+				ans += path
+				return
+
+			dfs(i + 1)  # 不选
+			path ^= nums[i]  # 选
+			dfs(i + 1)
+			path ^= nums[i]  # 回溯
+		dfs(0)
+		return ans
+
+# 92.字母大小写全排列
+class Solution:  # 避免了回溯，因为每次进入dfs时重新修改和判断path[i]的值
+	def letterCasePermutation(self, s):
+		ans = set()
+		n = len(s)
+		path = [''] * n
+		def dfs(i):
+			if i == n:
+				ans.add(''.join(path))
+				return
+
+			path[i] = s[i]
+			dfs(i + 1)
+			if s[i].isupper():
+				path[i] = s[i].lower()
+				dfs(i + 1)  # 转换
+			elif s[i].islower():
+				path[i] = s[i].upper()
+				dfs(i + 1)  # 转换
+			
+			# path.pop()
+		dfs(0)
+		return list(ans)
+
+# O(n*2^k) k为字母的个数
+class Solution:
+	def letterCasePermutation(self, s):
+		ans = []
+		n = len(s)
+		path = []
+		def dfs(i):
+			if i == n:
+				ans.append(''.join(path))
+				return
+			if s[i].isalpha():
+				path.append(s[i].lower())  # 对于本题，转变与不转变才是选与不选问题，要放在一起而不能用ifelse，才可以让每一种情况都有可能发生
+				dfs(i + 1)
+				path.pop()
+
+				path.append(s[i].upper())
+				dfs(i + 1)
+				path.pop()
+			else:
+				path.append(s[i])
+				dfs(i + 1)
+				path.pop()
+		dfs(0)
+		return ans
+
+# 93.字母组合迭代器
+class CombinationIterator:
+
+	def __init__(self, characters, combinationLength):
+		self.ans = []
+		n = len(characters)
+		path = []
+		def dfs(i):
+			if i == n:
+				if len(path) == combinationLength:
+					self.ans.append(''.join(path))
+				return
+		# 	dfs(i + 1)  # 不选
+		# 	path.append(characters[i])
+		# 	dfs(i + 1)  # 选
+		# 	path.pop()
+		# dfs(0)
+		# self.ans.sort()
+
+		# 优化——要求有序必须先选
+			path.append(characters[i])
+			dfs(i + 1)  # 选
+			path.pop()
+			dfs(i + 1)  # 不选
+		dfs(0)
+
+	def next(self):
+		return self.ans.pop(0)
+
+	def hasNext(self):
+		return len(self.ans) > 0
+
+		#枚举选那个
+		path = []
+		self.queue = []
+		def dfs(i):
+			if len(path) == combinationLength:
+				self.queue.append(''.join(path))
+				return 
+			for j in range(i, len(characters)):
+				path.append(characters[j])
+				dfs(j+1)
+				path.pop()
+		dfs(0)
+
+# 94.目标和
+class Solution:  # 超时，O(n*2^n)
+	def findTargetSumWays(self, nums, target):
+		ans = path = 0
+		n = len(nums)
+		def dfs(i):
+			nonlocal ans, path
+			if i == n:
+				if path == target:
+					ans += 1
+				return
+
+			path += nums[i]  # + 的情况
+			dfs(i + 1)
+			path -= nums[i]
+
+			path -= nums[i]  # - 的情况
+			dfs(i + 1)
+			path += nums[i]
+		dfs(0)
+		return ans
+## 记忆化搜索,O(n*sum(nums))
+class Solution:  
+	def findTargetSumWays(self, nums, target):
+		n = len(nums)
+		@cache
+		def dfs(i, temp_s):
+			if i == n:
+				return int(temp_s == target)
+			return dfs(i + 1, temp_s + nums[i]) + dfs(i + 1, temp_s - nums[i])
+		return dfs(0, 0)
+## 灵神题解——01背包思路,O(nm)
+class Solution:
+	def findTargetSumWays(self, nums, target):
+		s = sum(nums) - abs(target)
+		if s < 0 or s % 2:
+			return 0
+
+		@cache
+		def dfs(i, c):
+			if i < 0:
+				return int(c == 0)
+			if c < nums[i]:
+				return dfs(i - 1, c)  # 只能不选
+			return dfs(i - 1, c) + dfs(i - 1, c - nums[i])  # 不选 + 选
+		m = s // 2
+		return dfs(len(nums) - 1, m)
+
+# 95.删除后的最大子数组元素和
+class Solution:  # 这个题解是解原数组中的连续子数组最大和
+	def maxSum(self, nums):
+		pre_s = list(accumulate(nums, initial = 0))
+		ans = -inf
+		left = 0
+		dic_win = defaultdict(int)
+		for right, x in enumerate(pre_s[1:]):
+			dic_win[nums[right]] += 1
+			while dic_win[nums[right]] > 1:
+				dic_win[nums[left]] -= 1
+				left += 1
+			ans = max(ans, x - min(pre_s[left:right]))
+		return ans
+## 优化
+class Solution:
+    def maxSum(self, nums):
+        pre_s = list(accumulate(nums, initial=0))
+        ans = float('-inf')
+        left = 0
+        dic_win = defaultdict(int)
+        s = SortedList()
+        s.add(pre_s[0])
+
+        for right, x in enumerate(pre_s[1:]):
+            dic_win[nums[right]] += 1
+
+            while dic_win[nums[right]] > 1:
+                s.remove(pre_s[left])
+                dic_win[nums[left]] -= 1
+                left += 1
+
+            ans = max(ans, x - s[0])
+            s.add(x)
+
+        return ans
+## 原题解法
+class Solution:
+	def maxSum(self, nums):
+		nums = list(set(nums))
+		temp_s = 0
+		nums.sort(reverse = True)
+		for x in nums:
+			if x <= 0:
+				break
+			temp_s += x
+		return temp_s if temp_s > 0 else x
+class Solution:
+	def maxSum(self, nums):
+		nums = set(nums)
+		temp_s = 0
+		mx = -inf
+		for x in nums:
+			if x >= 0:
+				temp_s += x
+			mx = max(mx, x)
+		return temp_s if temp_s > 0 else mx
+
+# 96.统计数组中峰和谷的数量
+class Solution:
+	def countHillValley(self, nums):
+		ans = tag = pre_tag = 0
+		for i, x in enumerate(nums):
+			if i == 0 or i == len(nums):
+				continue
+			for j in range(i - 1, -1, -1):
+				if nums[j] > x:
+					tag = 1  # 谷的情况
+					break
+				elif nums[j] < x:
+					tag = -1  # 峰的情况
+					break
+			if tag == 0:
+				pre_tag = 0
+				continue
+			for k in range(i + 1, len(nums)):
+				if (nums[k] > x and tag == 1):
+					ans += 1
+					(nums[k] < x and tag == -1):
+					ans += 1
+					break
+		return ans
+## 优化——遇到相同的直接继续循环到最后一个
+class Solution:
+	def countHillValley(self, nums):
+		ans = 0
+		pre_num = nums[0]
+		for i, x in enumerate(nums):
+			if i == 0 or i == len(nums)-1 or nums[i] == nums[i + 1]:
+				continue
+			if (pre_num > x and nums[i + 1] > x) or \
+				(pre_num > x and nums[i + 1] > x):
+				ans += 1
+			pre_num = nums[i]
+		return ans
+## 灵神解法
+class Solution:
+	def countHillValley(self, nums):
+		ans = 0
+		pre = nums[0]
+		for i in range(1, len(nums) - 1):
+			cur = nums[i]
+			nxt = nums[i + 1]
+			if cur == nxt:
+				continue
+			if pre != cur and (pre < cur) == (cur > nxt):
+				ans += 1
+			pre = cur
+		return ans
+
+# 97.等积子集的划分方案
+class Solution:
+	def checkEqualPartitions(self, nums, target):
+		plus_s = 1
+		n = len(nums)
+		for x in nums:
+			plus_s *= x
+		@cache
+		def dfs(i, temp_plus):
+			if i == n:
+				return temp_plus == target and plus_s // temp_plus == target
+			return dfs(i + 1, temp_plus * nums[i]) or dfs(i + 1, temp_plus)
+		return dfs(0, 1)
+
+# 98.烹饪料理
+class Solution:
+	def perfectMenu(self, material, cookbooks, attribute, limit):
+		ans = -1
+		n = len(cookbooks)
+		m = len(cookbooks[0])
+		path = [0] * m
+		def dfs(i, temp_x, temp_y):
+			nonlocal ans
+			if i == n:
+				if temp_y >= limit:
+					ans = max(ans, temp_x)
+				return 
+			dfs(i + 1, temp_x, temp_y)  # 如果放在选这之后要注意temp_x, temp_y也被修改了需要回溯
+			if all(path[j] + cookbooks[i][j] <= material[j] for j in range(m)):
+				temp_x += attribute[i][0]
+				temp_y += attribute[i][1]
+				for j in range(m):
+					path[j] += cookbooks[i][j]
+				dfs(i + 1, temp_x, temp_y)
+				for j in range(m):
+					path[j] -= cookbooks[i][j]
+		dfs(0, 0, 0)
+		return ans
+class Solution:
+	def perfectMenu(self, material, cookbooks, attribute, limit):
+		ans = -1
+		n = len(cookbooks)
+		m = len(cookbooks[0])
+		path = [0] * m
+		def dfs(i, temp_x, temp_y):
+			nonlocal ans
+			if i == n:
+				if temp_y >= limit:
+					ans = max(ans, temp_x)
+				return 
+
+			if all(path[j] + cookbooks[i][j] <= material[j] for j in range(m)):
+				for j in range(m):
+					path[j] += cookbooks[i][j]
+				dfs(i + 1, temp_x + attribute[i][0], temp_y + attribute[i][1])
+				for j in range(m):
+					path[j] -= cookbooks[i][j]
+			dfs(i + 1, temp_x, temp_y)  # 如果放在选这之后要注意temp_x, temp_y也被修改了需要回溯
+		dfs(0, 0, 0)
+		return ans
+#################### 划分型回溯 ###################
+# 99.分割回文串
+## 灵神题解——逗号选或不选
+class Solution:
+	def partition(self, s):
+		n = len(s)
+		ans = []
+		path = []
+		def dfs(i, start):  # start表示子串开始的位置
+			if i == n:
+				ans.append(path.copy())
+				return
+			# 不选，当i = n - 1时只能分割
+			if i < n - 1:
+				dfs(i + 1, start)
+			# 分割，选i和i + 1之间的逗号
+			t = s[start:i + 1]
+			if t == t[::-1]:
+				path.append(t)
+				dfs(i + 1, i + 1)
+				path.pop()
+		dfs(0, 0)
+		return ans
+
+# 100.统计按位或能得到最大值的子集数目
+class Solution:
+	def countMaxOrSubsets(self, nums):
+		ans = 0
+		path = []
+		ans_lis = []
+		n = len(nums)
+		def dfs(i, temp_s):
+			nonlocal ans
+			if i == n:
+				ans = max(ans, temp_s)
+				ans_lis.append(path.copy())
+				return
+			dfs(i + 1, temp_s)  # 不选
+			path.append(nums[i])
+			dfs(i + 1, temp_s | nums[i])  # 选
+			path.pop()
+		dfs(0, 0)
+		result = 0
+		for path in ans_lis:
+			pre = 0
+			for x in path:
+				pre |= x
+			result += int(pre == ans)
+		return ans
+## 优化
+class Solution:
+	def countMaxOrSubsets(self, nums):
+		max_or = 0
+		count = 0
+		n = len(nums)
+		def dfs(i, or_sum):
+			nonlocal max_or, count
+			if i == n:
+				if or_sum > max_or:
+					count = 1
+					max_or = or_sum
+				elif or_sum == max_or:
+					count += 1
+				return
+			dfs(i + 1, or_sum)
+			dfs(i + 1, or_sum | nums[i])
+		dfs(0, 0)
+		return count
+## 灵神题解
+class Solution:
+	def countMaxOrSubsets(self, nums):
+		total_or = reduce(or_, nums)  # 按位或越多元素越大
+		n = len(nums)
+		ans = 0
+		def dfs(i, subset_or):
+			nonlocal ans
+			if i == n:
+				ans += int(subset_or == total_or)
+				return
+			dfs(i + 1, subset_or)  # 不选
+			dfs(i + 1, subset_or | nums[i])  # 选
+		dfs(0, 0)
+		return ans
+
+# 101.求一个整数的惩罚数
+## 灵神题解
+pre_sum = [0] * 1001
+for i in range(1, 1001):
+	s = str(i * i)
+	n = len(s)
+	def dfs(p, sum):
+		if p == n:
+			return sum == i
+		x = 0
+		for j in range(p, n):  # 枚举分割出从s[p]到s[j]的子串
+			x = x * 10 + int(s[j])
+			if dfs(j + 1, sum + x):
+				return True
+		return False
+	pre_sum[i] = pre_sum[i - 1] + (i * i if dfs(0, 0) else 0)
+class Solution:
+	def punishmentNumber(self, n):
+		return pre_sum[n]
+
+# 102.按位或最大的最小子数组长度
+class Solution:
+	def smallestSubarrays(self, nums):
+		n = len(nums)
+		sub_or = [0] * (n + 1)
+		for i in range(n - 1, -1, -1):
+			sub_or[i] = sub_or[i + 1] | nums[i]
+
+		ans = []
+		for i, x in enumerate(nums):
+			for j in range(i, n):
+				x |= nums[j]
+				if x == sub_or[i]:
+					ans.append(j - i + 1)
+					break
+		return ans
+# O(n*32)优化
+class Solution:
+	def smallestSubarrays(self, nums):
+		n = len(nums)
+		ans = [0] * n
+		last = [0] * 32
+
+		for i in range(n - 1, -1, -1):
+			for bit in range(32):
+				if (nums[i] >> bit) & 1:  #判断nums[i]的第bit位是不是1
+					last[bit] = i
+			furthest = i  # 以nums[i]为起始的要延伸的最远位置
+			for bit in range(32):
+				furthest = max(furthest, last[bit])
+			ans[i] = furthest - i + 1
+		return ans
+## 灵神题解1
+class Solution:
+	def smallestSubarrays(self, nums):
+		ans = [1] * len(nums)
+		for i, x in enumerate(nums):
+			for j in range(i - 1, -1, -1):
+				if (nums[j] | x) == nums[j]:  # 
+					break
+
+# 103.组合
+class Solution:  # O(n * 2^n)
+	def combine(self, n, k):
+		ans = []
+		path = []
+		def dfs(i):
+			if i == n:
+				if len(path) == k:
+					ans.append(path.copy())
+				return
+			## 剪枝, O(k * 2^n)
+			if len(path) + n - i < k:
+				return
+			dfs(i + 1)  # 不选
+			if len(path) < k:
+				path.append(i + 1)
+				dfs(i + 1)  # 选
+				path.pop()  # 恢复现场
+		dfs(0)
+		return ans
+## 灵神题解——O(k * Cnk)，组合数Cnk，路径长度k
+class Solution:
+	def combine(self, n, k):
+		ans = []
+		path = []
+
+		def dfs(i):
+			d = k - len(path)  # 还需要选的数
+			if d == 0:
+				ans.append(path.copy())
+				return
+
+			if i > d:
+				dfs(i - 1)  # 不选（当元素足够时才可以不选）
+			path.append(i)
+			dfs(i - 1)
+			path.pop()
+		dfs(n)  # 倒序枚举从n到1
+		return ans
+
+# 104.组合总和3
+class Solution:
+	def combinationSum3(self, k, n):
+		ans = []
+		path = []
+		def dfs(i):
+			diff = n - sum(path)
+			if diff == 0 and len(path) == k:
+				ans.append(path.copy())
+				return
+			if i == 10 or sum(path) > n or len(path) > k:
+				return
+
+			dfs(i + 1)  # 不选
+			path.append(i)
+			dfs(i + 1)  # 选
+			path.pop()
+		dfs(1)
+		return ans
+
+# 105.子集2
+class Solution:
+	def subsetsWithDup(self, nums):
+		nums.sort()
+		n = len(nums)
+		ans = []
+		path = []
+		def dfs(i):
+			if i == n:
+				ans.append(path.copy())
+				return
+			## 选x,之后的x可选可不选
+			x = nums[i]
+			path.append(x)
+			dfs(i + 1)
+			path.pop()
+
+			## 不选x，那么之后的x都不能选
+			i += 1
+			while i < n and nums[i] == x:
+				i += 1
+			dfs(i)
+		dfs(0)
+		return ans
+
+# 106.按位与最大的最长子数组
+class Solution:
+	def longestSubarray(self, nums):
+		mx_num = max(nums)
+		ans = 1
+		i = 0
+		n = len(nums)
+		while i < n:
+			if nums[i] == mx_num:
+				start = i
+				while i < n and nums[i] == mx_num:
+					i += 1
+				ans = max(ans, i - start)
+			i += 1
+		return ans
+## 滑动窗口	
+class Solution:
+	def longestSubarray(self, nums):
+		mx = max(nums)
+		ans = left = 0
+		for right, x in enumerate(nums):
+			if x != mx:
+				left = right + 1
+			ans = max(ans, right - left + 1)
+		return ans
+
+# 107.组合总和2
+class Solution:
+	def combinationSum2(self, candidates, target):
+		candidates.sort()
+		ans = []
+		path = []
+		n = len(candidates)
+		def dfs(i):
+			if sum(path) == target:
+				ans.append(path.copy())
+				return
+			if i == n or sum(path) > target:
+				return
+			## 选
+			x = candidates[i]
+			path.append(x)
+			dfs(i + 1)
+			path.pop()
+
+			## 不选
+			i += 1
+			while i < n and candidates[i] == x:
+				i += 1
+			dfs(i)
+		dfs(0)
+		return ans
+## 灵神题解
+class Solution:
+	def combinationSum2(self, candidates, target):
+		candidates.sort()
+		ans = []
+		path = []
+		n = len(candidates)
+		def dfs(i, left):
+			if left == 0:
+				ans.append(path.copy())
+				return
+			if i == n:
+				return
+			x = candidates[i]
+			if left < x:  # 后续无论选或不选都得>target
+				return
+
+			path.append(x)
+			dfs(i + 1, left - x)
+			path.pop()
+
+			i += 1
+			while i < n and candidates[i] == x:
+				i += 1
+			dfs(i, left)
+		dfs(0, target)
+		return ans
+
+# 108.非递减子序列
+class Solution:
+	def findSubsequences(self, nums):
+		ans = []
+		path = []
+		n = len(nums)
+		def dfs(i):
+			if i == n:
+				if len(path) >= 2:
+					ans.append(path.copy())
+				return
+
+			## 选
+			x = nums[i]
+			if not path or x >= path[-1]:
+				path.append(x)
+				dfs(i + 1)
+				path.pop()
+
+			## 不选——这种解法必须要排序
+			i += 1
+			while i < n and nums[i] == x:
+				i += 1
+			dfs(i)
+		dfs(0)
+		return ans
+class Solution:  
+	def findSubsequences(self, nums):
+		ans = []
+		n = len(nums)
+
+		def dfs(i, path):
+			if len(path) >= 2:
+				if path[-1] >= path[-2]:
+					ans.append(path)
+				else:
+					return
+
+			for j in range(i, n):
+				if nums[j] in nums[i:j]:
+					continue
+				dfs(i + 1, path + [nums[i]])
+		dfs(0, [])
+		return ans
+class Solution:
+    def findSubsequences(self, nums):
+        result = []
+
+        def backtracking(start_index, path):
+            # 终止条件
+            if len(path) >= 2:
+                if path[-1] >= path[-2]:
+                    result.append(path)
+                else:
+                    return 
+            # 回溯
+            for i in range(start_index, len(nums)):
+                # 去重
+                if nums[i] in nums[start_index:i]:
+                    continue
+                backtracking(i + 1, path + [nums[i]])
+        
+        backtracking(0, [])
+        return result
+
+
+
+
+
