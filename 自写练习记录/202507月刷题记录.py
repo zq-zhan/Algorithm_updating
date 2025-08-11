@@ -2915,7 +2915,119 @@ class Solution:
         backtracking(0, [])
         return result
 
+# 109.相邻值的按位异或
+class Solution:
+	def doesValidArrayExist(self, derived):
+		# n = len(derived)
+		# path = [0] * n
+		# ans = False
+		# def dfs(i, path):
+		# 	nonlocal ans
+		# 	if i == 0:
+		# 		if path[0] ^ path[1] == derived[0]:
+		# 			ans = True
+		# 		return
+		# 	if path[i] ^ path[(i + 1)%n] != derived[i]:
+		# 		return 
 
+		# 	## 选1
+		# 	path[i] = 1
+		# 	dfs(i + 1, path)
 
+		# 	## 不选1
+		# 	dfs(i + 1, path)
+		# dfs(n - 1, path)
+		return sum(derived) % 2 == 0
+class Solution:
+	def doesValidArrayExist(self, derived):
+		def check(first):  # 设定 original[0] = first 后，推出的 original[n] 是否等于 original[0]
+			temp = first
+			for i, x in enumerate(derived):
+				first ^= x
+			return first == temp
+		return check(0) or check(1)
 
+# 110.生成不含相邻零的二进制字符串
+class Solution:
+	def validStrings(self, n):
+		ans = []
+		path = []
+		def dfs(i):
+			if i == n:
+				if len(path) == 1 or not path[-1] == path[-2] == '0':
+					ans.append(''.join(path))
+				return
+
+			if len(path) >= 2 and path[-1] == path[-2] == '0':
+				return
+
+			path.append('1')  
+			dfs(i + 1)
+			path.pop()
+
+			path.append('0')
+			dfs(i + 1)
+			path.pop()
+		dfs(0)
+		return ans
+## 灵神题解：不是选的时候有条件，而是不选的时候有条件
+class Solution:
+	def validStrings(self, n):
+		ans = []
+		path = []
+		def dfs(i):
+			if i == n:
+				ans.append(''.join(path))
+				return
+
+			path.append('1')
+			dfs(i + 1)
+			path.pop()
+
+			if i == 0 or path[i - 1] == '1':
+				path.append('0')
+				dfs(i + 1)
+				path.pop()
+
+		dfs(0)
+		return ans
+
+# 111.连续差相同的数字
+class Solution:
+	def numsSameConsecDiff(self, n, k):
+		ans = []
+		def dfs(i, x):
+			if i == n:
+				ans.append(x)
+				return
+			last = int(str(x)[-1])
+			if k != 0:
+				if last - k >= 0:
+					dfs(i + 1, x * 10 + last - k)
+				if last + k <= 9:
+					dfs(i + 1, x * 10 + last + k)
+				if last - k < 0 or last + k > 9:
+					return
+			else:
+				dfs(i + 1, x * 10 + last)
+		for x in range(1, 10):
+			dfs(1, x)
+		return ans
+## 简化
+class Solution:
+	def numsSameConsecDiff(self, n, k):
+		ans = []
+
+		def dfs(i, num):
+			if i == n:
+				ans.append(num)
+				return
+			last = num % 10
+			next_digits = set([last + k, last - k])
+			for nxt in next_digits:
+				if 0 <= nxt <= 9:
+					dfs(i + 1, num * 10 + nxt)
+		for x in range(1, 10):
+			dfs(1, x)
+		return ans
 
