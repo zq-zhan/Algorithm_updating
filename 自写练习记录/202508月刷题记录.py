@@ -1019,10 +1019,11 @@ class Solution:
 			for x in range(1, k + 1):
 				if path < x:
 					break
-				res = (res + dfs(i - 1, path - k)) % MOD
+				res = (res + dfs(i - 1, path - x)) % MOD
 			return res
 		return dfs(n, target)
 
+####################### 经典线性DP #####################
 # 44.最长公共子序列
 class Solution:
 	def longestCommonSubsequence(self, text1, text2):
@@ -1054,6 +1055,1034 @@ class Solution:
 			return min(dfs(i - 1, j), dfs(i, j - 1)) + 1
 		return dfs(n - 1, m - 1)
 
+# 46.20250812将一个数字表示成幂的和的方案数
+class Solution:
+	def numberOfWays(self, n, x):
+		MOD = 10 ** 9 + 7
+		@cache
+		def dfs(i, path):
+			if i < 0 or path > n:
+				return 0
+			if path == n:
+				return 1
+			return (dfs(i - 1, path + i ** x) + dfs(i - 1, path)) % MOD
+		return dfs(n, 0)
+
+# 47.两个字符串的最小ASCII删除和
+class Solution:
+	def minimumDeleteSum(self, s1, s2):
+		n, m = len(s1), len(s2)
+		@cache
+		def dfs(i, j):
+			if i < 0 and j < 0:
+				return 0
+			elif i < 0:
+				return sum(ord(s2[k]) for k in range(j + 1))
+			elif j < 0:
+				return sum(ord(s1[k]) for k in range(i + 1))
+			if s1[i] == s2[j]:
+				return dfs(i - 1, j - 1)
+			return min(dfs(i - 1, j) + ord(s1[i]), dfs(i, j - 1) + ord(s2[j]))
+		return dfs(n - 1, m - 1)
+
+# 48.编辑距离
+class Solution:
+	def minDistance(self, word1, word2):
+		n, m = len(word1), len(word2)
+		@cache
+		def dfs(i, j):
+			if i < 0 or j < 0:
+				return i + j + 2
+			if word1[i] == word2[j]:
+				return dfs(i - 1, j - 1)
+			return min(dfs(i, j - 1) + 1, dfs(i - 1, j) + 1,dfs(i - 1, j - 1) + 1)
+		return dfs(n - 1, m - 1)
+
+# 49.不相交的线
+class Solution:
+	def maxUncrossedLines(self, nums1, nums2):
+		n, m = len(nums1), len(nums2)
+		@cache
+		def dfs(i, j):
+			if i < 0 or j < 0:
+				return 0
+			if nums1[i] == nums2[j]:
+				return dfs(i - 1, j - 1) + 1
+			return max(dfs(i - 1, j), dfs(i, j - 1))
+		return dfs(n - 1, m - 1)
+
+# 50.两个子序列的最大点积
+class Solution:
+	def maxDotProduct(self, nums1, nums2):
+		if all(x < 0 for x in nums1) and all(x > 0 for x in nums2):
+			return max(nums1) * min(nums2)
+		elif all(x > 0 for x in nums1) and all(x < 0 for x in nums2):
+			return min(nums1) * max(nums2)
+
+		n, m = len(nums1), len(nums2)
+		@cache
+		def dfs(i, j):
+			if i < 0 or j < 0:
+				return 0
+			return max(dfs(i - 1, j), dfs(i, j - 1), dfs(i - 1, j - 1) + nums1[i] * nums2[j])
+		return dfs(n - 1, m - 1)
+class Solution:
+	def maxDotProduct(self, nums1, nums2):
+		n, m = len(nums1), len(nums2)
+		@cache
+		def dfs(i, j, flag):
+			if i < 0 or j < 0:
+				return 0 if flag else -inf
+			return max(
+				dfs(i - 1, j, flag),
+				dfs(i, j - 1, flag),
+				dfs(i - 1, j - 1, True) + nums1[i] * nums2[j]
+				)
+		return dfs(n - 1, m - 1, False)
+
+# 51.202508133的幂
+class Solution:
+	def isPowerOfThree(self, n):
+		if n <= 0:
+			return False
+		target = int(math.log(n, 3)) + 1
+		for i in range(target + 1):
+			if 3 ** i == n:
+				return True
+		return False
+## 灵神题解——3的幂质因子只有3
+class Solution:
+	def isPowerOfThree(self, n):
+		return n > 0 and 3 ** 19 % n == 0
+
+# 52.最高乘法得分
+class Solution:
+	def maxScore(self, a, b):
+		n = len(b)
+		@cache
+		def dfs(i, j):
+			if i < 0:
+				return 0
+			elif j < 0:
+				return -inf
+			return max(
+				dfs(i, j - 1),
+				dfs(i - 1, j - 1) + a[i] * b[j]
+				)
+		return dfs(3, n - 1)
+
+# 53.不同子序列
+class Solution:
+	def numDistinct(self, s, t):
+		n, m = len(s), len(t)
+		@cache
+		def dfs(i, j):
+			if j < 0:
+				return 1
+			elif i < 0:
+				return 0
+			res = 0
+			if s[i] == t[j]:
+				res += dfs(i - 1, j - 1)
+			res += dfs(i - 1, j)
+			return res
+		return dfs(n - 1, m - 1)
+
+# 54.插入一个字母的最大子序列数
+class Solution:  # 错解！！！
+	def numOfSubsequences(self, s):
+		t = "LCT"
+		@cache
+		def dfs(i, j, tag):
+			if j < 0:
+				return 1
+			if i < 0:
+				return 0
+			res = 0
+			if s[i] == t[j]:
+				res += dfs(i - 1, j - 1, tag)
+			if tag:
+				res = max(res, dfs(i, j - 1, False))
+			res = max(res, dfs(i - 1, j, tag))
+			return res  
+		return dfs(len(s) - 1, 2, True)
+
+# 55.最长递增子序列
+class Solution:  # 用LCS求LIS
+	def lengthOfLIS(self, nums):
+		new_nums = sorted(set(nums))
+		n, m = len(nums), len(new_nums)
+		@cache
+		def dfs(i, j):
+			if i < 0 or j < 0:
+				return 0
+			if nums[i] == new_nums[j]:
+				return dfs(i - 1, j - 1) + 1
+			return max(dfs(i - 1, j), dfs(i, j - 1))
+		return dfs(n - 1, m - 1)
+## 灵神思路——枚举选哪个
+class Solution:  
+	def lengthOfLIS(self, nums):
+		n = len(nums)
+		@cache
+		def dfs(i):
+			res = 0
+			for j in range(i):
+				if nums[j] < nums[i]:
+					res = max(res, dfs(j))
+			return res + 1
+		return max(dfs(i) for i in range(n))
 
 
+# 56.20250814判断一个数字是否可以表示成三的幂的和
+class Solution:  # 超过内存限制
+	def checkPowersOfThree(self, n):
+		@cache
+		def dfs(i, path):
+			if path < 0 or i > n:
+				return False
+			elif path == 0:
+				return True
+			return dfs(i + 1, path - 3 ** i) or dfs(i + 1, path)
+		return dfs(0, n)
+## 灵神题解——遍历n的三进制的每一位如果有2就返回false
+class Solution:  
+	def checkPowersOfThree(self, n):
+		while n:
+			if n % 3 == 2:
+				return False
+			n //= 3
+		return True
 
+# 57.字母异位词分组
+class Solution:
+	def groupAnagrams(self, strs):
+		ans_dic = defaultdict(list)
+		for substr in strs:
+			res = ''.join(sorted(substr))
+			ans_dic[res].append(substr)
+		return list(ans_dic.values())
+
+# 58.最长连续序列
+class Solution:
+	def longestConsecutive(self, nums):
+		nums = list(set(nums))
+		heapq.heapify(nums)
+		ans = temp_length = 0
+		pre = 'a'
+		while nums:
+			if pre == 'a' or nums[0] - pre == 1:
+				temp_length += 1
+			else:
+				temp_length = 1
+			pre = heapq.heappop(nums)
+			ans = max(ans, temp_length)
+		return ans
+## 灵神题解
+class Solution:
+	def longestConsecutive(self, nums):
+		st = set(nums)
+		ans = 0
+		for x in st:
+			if x - 1 in st:
+				continue
+			y = x + 1
+			while y in st:
+				y += 1
+			ans = max(ans, y - x)
+		return ans
+
+# 59.202508154的幂
+class Solution:
+	def isPowerOfFour(self, n):
+		if n <= 0:
+			return False
+		for i in range(n):
+			if 4 ** i == n:
+				return True
+			elif 4 ** i > n:
+				return False
+
+# 60.202508166和9组成的最大数字
+class Solution:
+	def maximum69Number(self, num):
+		num = list(str(num))
+		for i, x in enumerate(num):
+			if x == '9':
+				continue
+			else:
+				nums[i] = '9'
+				break
+		return int(''.join(num))
+
+# 61.20250817新21点
+class Solution:
+	def new21Game(self, n, k, maxPts):
+		res = []
+		@cache
+		def dfs(path_s, prob):
+			if path_s >= k:
+				res.append((path_s, prob))
+				return 
+			for x in range(1, maxPts + 1):
+				dfs(path_s + x, prob * (1 / maxPts))
+		dfs(0, 1.0)
+		ans = 0
+		for score, prob in res:
+			if score <= n:
+				ans += prob
+		return ans
+class Solution:
+    def new21Game(self, N: int, K: int, W: int) -> float:
+        dp=[None]*(K+W)
+        s=0
+        for i in range(K,K+W):          # 填蓝色的格子
+            dp[i] = 1 if i<=N else 0
+            s+=dp[i]
+        for i in range(K-1,-1,-1):      # 填橘黄色格子
+            dp[i]=s/W
+            s += dp[i]-dp[i+W]
+        return dp[0]
+
+# 62.找到字符串中所有字母异位词
+class Solution:
+	def findAnagrams(self, s, p):
+		dic_p = Counter(p)
+		temp_win = dic_p.copy()
+		ans = []
+		left = 0
+		for right, x in enumerate(s):
+			if x not in dic_p:
+				temp_win = dic_p.copy()
+				left = right + 1
+				continue
+			elif not temp_win[x]:
+				temp_win = dic_p.copy()
+				left = right
+			temp_win[x] -= 1
+			if max(temp_win.values()) == 0:
+				ans.append(left)
+				temp_win[s[left]] += 1
+				left += 1
+		return ans
+class Solution:
+	def findAnagrams(self, s, p):
+		dic_p = Counter(p)
+		ans = []
+		k = len(p)
+		# n = len(s)
+		temp_win = defaultdict(int)
+		for i, x in enumerate(s):
+			temp_win[x] += 1
+			if sum(temp_win.values()) == k:
+				if temp_win == dic_p:
+					ans.append(i - k + 1)
+				if temp_win[s[i - k + 1]] == 1:
+					del temp_win[s[i - k + 1]]
+				else:
+					temp_win[s[i - k + 1]] -= 1
+		return ans
+
+# 63.滑动窗口最大值
+class Solution:  # 超时
+	def maxSlidingWindow(self, nums, k):
+		ans = []
+		n = len(nums)
+		temp_win = defaultdict(int)
+		left = 0
+		for right, x in enumerate(nums):
+			temp_win[x] += 1
+			if right - left + 1 == k:
+				ans.append(max(temp_win.keys()))
+				if temp_win[nums[left]] == 1:
+					del temp_win[nums[left]]
+				else:
+					temp_win[nums[left]] -= 1
+				left += 1
+		return ans
+## 灵神题解——队列
+class Solution:
+    def maxSlidingWindow(self, nums, k):
+        ans = [0] * (len(nums) - k + 1)  # 窗口个数
+        q = deque()  # 双端队列
+
+        for i, x in enumerate(nums):
+            # 1. 右边入
+            while q and nums[q[-1]] <= x:
+                q.pop()  # 维护 q 的单调性
+            q.append(i)
+
+            # 2. 左边出
+            left = i - k + 1  # 窗口左端点
+            if q[0] < left:  # 队首已经离开窗口了
+                q.popleft()
+
+            # 3. 在窗口左端点处记录答案
+            if left >= 0:
+                # 由于队首到队尾单调递减，所以窗口最大值就在队首
+                ans[left] = nums[q[0]]
+
+        return ans
+
+# 64.轮转数组
+## 灵神题解
+class Solution:
+	def rotate(self, nums, k):
+		def reverse(i, j):
+			while i < j:
+				nums[i], nums[j] = nums[j], nums[i]
+				i += 1
+				j -= 1
+
+		n = len(nums)
+		k %= n
+		reverse(0, n - 1)
+		reverse(0, k - 1)
+		reverse(k, n - 1)
+class Solution:
+	def rotate(self, nums, k):
+		n = len(nums)
+		k = k % n
+		nums[:] = nums[-k:] + nums[:-k]
+
+# 65.2025081824点游戏
+EPS = 1e-9
+class Solution:
+	def judgePoint24(self, cards):
+		n = len(cards)
+		if n == 1:
+			return abs(cards[0] - 24) < EPS
+
+		for i, x in enumerate(cards):
+			for j in range(i + 1, n):
+				y = cards[j]
+				candidates = [x + y, x - y, y - x, x * y]
+				if abs(y) > EPS:  # 分母不为0
+					candidates.append(x / y)
+				if abs(x) > EPS:
+					candidates.append(y / x)
+
+				new_cards = cards[:j] + cards[j + 1:]
+				for res in candidates:
+					new_arr[i] = res
+					if self.judgePoint24(new_cards):
+						return True
+		return False
+
+# 66.除自身以外数组的乘积
+class Solution:
+	def productExceptSelf(self, nums):
+		n = len(nums)
+		new_arr1 = [1]
+		for x in nums:
+			new_arr1.append(new_arr1[-1] * x)
+		new_arr2 = [1] * (n + 1)
+		for i in range(n - 1, -1, -1):
+			new_arr2[i] = new_arr2[i + 1] * nums[i]
+
+		ans = [0] * n
+		for i in range(n):
+			ans[i] = new_arr1[i] * new_arr2[i + 1]
+		return ans
+
+# 67.将三个组排序
+class Solution:  # 转换为求最长递增子序列的长度
+	def minimumOperations(self, nums):
+		n = len(nums)
+		@cache
+		def dfs(i):
+			res = 0
+			for j in range(i):
+				if nums[j] <= nums[i]:
+					res = max(res, dfs(j))
+			return res + 1
+		return n - max(dfs(i) for i in range(n))
+
+# 68.得到山形数组的最少删除次数
+class Solution:
+	def minimumMountainRemovals(self, nums):
+		n = len(nums)
+		@cache
+		def dfs_add(i):
+			res = 0
+			for j in range(i):
+				if nums[j] < nums[i]:
+					res = max(res, dfs_add(j))
+			return res + 1
+		@cache
+		def dfs_diff(i):
+			res = 0
+			for j in range(i + 1, n):
+				if nums[j] < nums[i]:
+					res = max(res, dfs_diff(j))
+			return res + 1
+		ans = 3
+		for i in range(n):
+			left = dfs_add(i)
+			right = dfs_diff(i)
+			if left >= 2 and right >= 2:
+				ans = max(ans, left + right - 1)
+		return n - ans
+
+# 69.接雨水
+## 灵神题解——前后缀分解
+class Solution:
+	def trap(self, height):
+		n = len(height)
+		pre_max = [0] * n  # pre_max[i]表示从height[0]到height[i]的最大值
+		pre_max[0] = height[0]
+		for i in range(1, n):
+			pre_max[i] = max(pre_max[i - 1], height[i])
+
+		suf_max = [0] * n
+		suf_max[-1] = height[-1]
+		for i in range(n - 2, -1, -1):
+			suf_max[i] = max(suf_max[i + 1], height[i])
+
+		ans = 0
+		for h, pre, suf in zip(height, pre_max, suf_max):
+			ans += min(pre, suf) - h
+		return ans
+		
+# 70.20250819全0子数组的数目
+class Solution:
+	def zeroFilledSubarray(self, nums):
+		nums = nums + [1]
+		ans = left = 0
+		for right, x in enumerate(nums):
+			if x == 0:
+				continue
+			ans += (right - left) * (right - left + 1) // 2
+			left = right + 1
+		return ans
+## 灵神思路扩展——增量法
+class Solution:
+	def zeroFilledSubarray(self, nums):
+		ans = cnt0 = 0
+		for x in nums:
+			if x:
+				cnt0 = 0
+			else:
+				cnt0 += 1
+				ans += cnt0
+		return ans
+
+# 71.找出到每个位置为止最长的有效障碍赛跑路线
+class Solution:  # 超时
+	def longestObstacleCourseAtEachPosition(self, obstacles):
+		ans = []
+		n = len(obstacles)
+		@cache
+		def dfs(i):
+			res = 0
+			for j in range(i):
+				if obstacles[j] <= obstacles[i]:
+					res = max(res, dfs(j))
+			return res + 1
+		for i in range(n):
+			ans.append(dfs(i))
+		return ans
+
+# 72.使数组k递增的最少操作次数
+def find_mx(nums):
+	g = []
+	for x in nums:
+		j = bisect_right(g, x)
+		if j == len(g):
+			g.append(x)
+		else:
+			g[j] = x
+	return len(g) 
+
+class Solution:
+	def kIncreasing(self, arr, k):
+		n = len(arr)
+		ans = 0
+		# @cache
+		# def dfs(i, nums):
+		# 	res = 0
+		# 	for j in range(i):
+		# 		if nums[j] <= nums[i]:
+		# 			res = max(res, dfs(j))
+		# 	return res + 1
+				
+		for i in range(k):
+			new_arr = [arr[j] for j in range(i, n, k)]
+			m = len(new_arr)
+			# temp_mx = max(dfs(i, new_arr) for i in range(m))
+			temp_mx = find_mx(new_arr)
+			ans += m - temp_mx
+		return ans
+## 写法二
+class Solution:
+	def kIncreasing(self, arr, k):
+		def f(x):
+			g = []
+			for i in range(x, n, k):
+				j = bisect_right(g, arr[i])
+				if j == len(g):
+					g.append(arr[i])
+				else:
+					g[j] = arr[i]
+			return len(g)
+		n = len(arr)
+		return n - sum(f(x) for x in range(k))
+## 记忆化搜索解法
+class Solution:
+	def kIncreasing(self, arr, k):
+		n = len(arr)
+		@cache
+		def dfs(i):
+			res = 0
+			for j in range(i - k, -1, -k):
+				if arr[j] <= arr[i]:
+					res = max(res, dfs(j))
+			return res + 1
+		# return n - sum(dfs(i) for i in range(n))  这里有问题，还是要拆
+        if k == 1:
+            return n - max(dfs(i) for i in range(n))
+        else:
+            total = 0
+            # 分成k个独立的子序列，分别计算每个子序列的LNDS
+            for start in range(k):
+                max_len = 0
+                for i in range(start, n, k):
+                    max_len = max(max_len, dfs(i))
+                total += max_len
+            return n - total
+
+# 73.20250820统计全为1的正方形子矩阵
+class Solution:
+    def countSquares(self, matrix):
+        ans = 0
+        m, n = len(matrix), len(matrix[0])
+        for i in range(m):
+            for j in range(n):
+                if matrix[i][j] == 1:  # 只有以 1 开头的才可能形成正方形
+                    cnt = 0
+                    while i + cnt < m and j + cnt < n:
+                        # 计算子矩阵 (i,j) 到 (i+cnt, j+cnt) 的和
+                        total = 0
+                        for r in range(i, i + cnt + 1):
+                            total += sum(matrix[r][j:j + cnt + 1])
+                        # 判断是否全是 1
+                        if total == (cnt + 1) * (cnt + 1):
+                            ans += 1
+                            cnt += 1
+                        else:
+                            break
+        return ans
+## 灵神题解——动态规划
+class Solution:
+	def countSquares(self, matrix):
+		m, n = len(matrix), len(matrix[0])
+		f = [[0] * (n + 1) for _ in range(m + 1)]
+		for i, row in enumerate(matrix):
+			for j, x in enumerate(row):
+				if x:
+					f[i + 1][j + 1] = min(f[i][j], f[i][j + 1], f[i + 1][j]) + 1
+		return sum(map(sum, f))
+
+# 74.检查数组是否存在有效划分
+## 灵神题解——递推写法
+class Solution:
+	def validPartition(self, nums):
+		n = len(nums)
+		f = [True] + [False] * n
+		for i, x in enumerate(nums):
+			if i > 0 and f[i - 1] and x == nums[i - 1] or \
+				i > 1 and f[i - 2] and (x == nums[i - 1] == nums[i - 2] or \
+										x == nums[i - 1] + 1 == nums[i - 2] + 2):
+				f[i + 1] = True
+		return f[n]
+## 递归		
+class Solution:
+	def validPartition(self, nums):
+		@cache
+		def dfs(i):
+			if i < 0:
+				return True
+			elif i == 0:
+				return False
+			res = False
+			if nums[i] == nums[i - 1]:
+				res |= dfs(i - 2)
+			if i > 1 and (nums[i] == nums[i - 1] == nums[i - 2] or nums[i] == nums[i - 1] + 1 == nums[i - 2] + 2):
+				res |= dfs(i - 3)
+			return res
+		return dfs(len(nums) - 1)
+
+# 75.单词拆分
+class Solution:
+	def wordBreak(self, s, wordDict):
+		wordDict = set(wordDict)
+		wordLen = list(map(len, wordDict))
+		@cache
+		def dfs(i):
+			if i < 0:
+				return True
+			# elif i == 0:
+			# 	return s[0] in wordDict
+			elif i < min(wordLen) - 1:
+				return False
+			res = False
+			for length in wordLen:
+				if i - length + 1 >= 0 and s[i - length + 1:i + 1] in wordDict:
+					res |= dfs(i - length)
+				# res |= dfs(i - length) and s[i - length + 1:i + 1] in wordDict:
+			return res
+		return dfs(len(s) - 1)
+
+# 76.20250821统计全1子矩形
+## 灵神题解
+class Solution:
+    def numSubmat(self, mat):
+        m, n = len(mat), len(mat[0])
+        ans = 0
+        for top in range(m):  # 枚举上边界
+            a = [0] * n
+            for bottom in range(top, m):  # 枚举下边界
+                h = bottom - top + 1  # 高
+                # 2348. 全 h 子数组的数目
+                last = -1
+                for j in range(n):
+                    a[j] += mat[bottom][j]  # 把 bottom 这一行的值加到 a 中
+                    if a[j] != h:
+                        last = j  # 记录上一个非 h 元素的位置
+                    else:
+                        ans += j - last
+        return ans
+
+# 77.分割回文串2
+## 灵神题解
+class Solution:
+	def minCut(self, s):
+		@cache
+		def is_palindrome(l, r):
+			if l >= r:
+				return True
+			return s[l] == s[r] and is_palindrome(l + 1, r - 1)
+		@cache
+		def dfs(r):
+			if is_palindrome(0, r):
+				return 0
+			res = inf
+			for l in range(1, r + 1):  # 枚举分割位置
+				if is_palindrome(l, r):
+					res = min(res, dfs(l - 1) + 1)
+			return res
+		return dfs(len(s) - 1)
+		
+# 78.字符串中的额外字符
+class Solution:
+	def minExtraChar(self, s, dictionary):
+		dictionary = set(dictionary)
+		wordLen = set(map(len, dictionary))
+		@cache
+		def dfs(i):
+			if i < min(wordLen) - 1:
+				return max(0, i + 1)
+			ans = dfs(i - 1) + 1  # 不选的时候ans最大
+			for length in wordLen:
+				if i >= length - 1 and s[i - length + 1:i + 1] in dictionary:
+					ans = min(ans, dfs(i - length))
+			return ans
+		return dfs(len(s) - 1)
+class Solution:
+	def minExtraChar(self, s, dictionary):
+		dictionary = set(dictionary)
+		mn_len = min(list(map(len, dictionary)))
+		@cache
+		def dfs(i):
+			if i < mn_len - 1:
+				return max(0, i + 1)
+			res = inf
+			for j in range(i + 1):
+				if s[j:i + 1] in dictionary:
+					res = min(res, dfs(j - 1))
+					break
+			res = min(res, dfs(i - 1) + 1)
+			return res
+		return dfs(len(s) - 1)
+
+# 79.20250822包含所有1的最小矩形面积1
+class Solution:
+	def minimumArea(self, grid):
+		n, m = len(grid), len(grid[0])
+		left = m - 1
+		right = 0
+		high = 0
+		low = n - 1
+		for i in range(n):
+			for j in range(m):
+				if grid[i][j]:
+					left = min(left, j)
+					right = max(right, j)
+					# high = max(high, i)
+					high = i
+					low = min(low, i)
+		return (right - left + 1) * (high - low + 1)
+
+# 80.最大化子数组的总成本
+class Solution:
+	def maximumTotalCost(self, nums):
+		@cache
+		def cost(i, j):
+			res = 0
+			for k, x in enumerate(nums[i:j + 1]):
+				res += x * (-1) ** k
+			return res
+		@cache
+		def dfs(i):
+			if i < 0:
+				return 0
+			res = -inf
+			for j in range(i + 1):
+				res = max(res, dfs(j - 1) + cost(j, i))
+			return res
+		return dfs(len(nums) - 1)
+## 灵神题解——优化
+class Solution:
+	def maximumTotalCost(self, nums):
+		@cache
+		def dfs(i):
+			if i < 0:
+				return 0
+			if i == 0:
+				return nums[0]
+			return max(dfs(i - 1) + nums[i], dfs(i - 2) + nums[i - 1] - nums[i])
+		return dfs(len(nums) - 1)
+
+# 81.20250823包含所有1的最小矩形面积2
+class Solution:
+	def minimumSum(self, grid):
+
+# 82.将字符串分割为最少的美丽子字符串
+class Solution:
+	def minimumBeautifulSubstrings(self, s):
+		# @cache
+		# def check(x):
+		# 	for i in range(x + 1):
+		# 		if 5 ** i == x:
+		# 			return True
+		# 		elif 5 ** i > x:
+		# 			break
+		# 	return False
+		target = {1, 5, 25, 125, 625, 3125, 15625}
+		@cache
+		def dfs(i):
+			if i < 0:
+				return 0
+			res = inf
+			for j in range(i + 1):
+				x = int(s[j:i + 1], 2)
+				if s[j] == '1' and x in target:
+					res = min(res, dfs(j - 1) + 1)
+			return res
+		ans = dfs(len(s) - 1)
+		return ans if ans < inf else -1
+
+# 83.20250824删掉一个元素以后全为1的最长子数组
+class Solution:
+	def longestSubarray(self, nums):
+		if sum(nums) == len(nums):
+			return len(nums) - 1
+		ans = cnt = left = 0
+		for right, x in enumerate(nums):
+			while x == 0 and cnt == 1:
+				cnt -= int(nums[left] == 0)
+				left += 1
+			cnt += int(x == 0)
+			ans = max(ans, right - left + 1 - cnt)
+		return ans
+## 不定长滑动窗口解法
+class Solution:
+	def longestSubarray(self, nums):
+		cnt_win = 0
+		ans = 0 
+		left = 0
+		for right, c in enumerate(nums):
+			cnt_win += 1 if c == 0 else 0
+			while cnt_win > 1:
+				cnt_win -= 1 if nums[left] == 0 else 0
+				left += 1
+			ans = max(ans, right - left)
+		return ans
+class Solution:
+	def longestSubarray(self, nums):
+		cnt_win = 0
+		ans = left = 0
+		for right, c in enumerate(nums):
+			cnt_win += (1 - c)
+			while cnt_win > 1:
+				cnt_win -= 1 - nums[left]
+				left += 1
+			ans = max(ans, right - left + 1 - cnt_win)
+		return min(ans, len(nums) - 1)
+
+# 84.解码方法
+class Solution:  # 错解
+	def numDecodings(self, s):
+		if s.startswith('0'):
+			return 0
+		@cache
+		def dfs(i):
+			if i < 0:
+				return 0
+			res = 0
+			for j in range(i + 1):
+				if s[j] != '0' and int(s[j:i + 1]) < 27:
+					res = max(res, dfs(j - 1) + 1)
+			return res
+		return dfs(len(s) - 1)
+class Solution:  
+	def numDecodings(self, s):
+		@cache
+		def dfs(i):
+			if i < 0:
+				return 1
+			ans = 0
+			num = int(s[i:i + 1])
+			if 1 <= num <= 9:
+				ans += dfs(i - 1)
+			num = int(s[max(i - 1, 0):i + 1])
+			if 10 <= num <= 26:
+				ans += dfs(i - 2)
+			return ans
+		return dfs(len(s) - 1)
+
+##################### 状态机DP #################
+# 85.买卖股票的最佳时机
+class Solution:
+	def maxProfit(self, prices):
+		n = len(prices)
+		suf_mx = [0] * (n + 1)
+		for i in range(n - 1, -1, -1):
+			suf_mx[i] = max(prices[i], suf_mx[i + 1])
+		pre_min = inf
+		ans  = 0
+		for i, x in enumerate(prices):
+			ans = max(ans, suf_mx[i] - pre_min)
+			pre_min = min(pre_min, x)
+		return ans
+## 简洁写法——枚举卖出价格，维护最小的买入价格即可
+class Solution:
+	def maxProfit(self, prices):
+		ans = 0
+		pre_buy = prices[0]
+		for sold in prices:
+			ans = max(ans, sold - pre_buy)
+			pre_buy = min(pre_buy, sold)
+		return ans
+
+# 86.买卖股票的最佳时机2
+class Solution:  # 超出内存限制
+	def maxProfit(self, prices):
+		n = len(prices)
+		@cache
+		def dfs(i, x):
+			if i > n - 1:
+				return 0
+			if x != -1:
+				return max(dfs(i, -1) + prices[i] - x, dfs(i + 1, x))
+			return max(dfs(i + 1, prices[i]), dfs(i + 1, -1))
+		return dfs(0, -1)
+## 灵神题解
+class Solution:
+	def maxProfit(self, prices):
+		n = len(prices)
+		@cache
+		def dfs(i, hold):
+			if i < 0:
+				return -inf if hold else 0
+			if hold:
+				return max(dfs(i - 1, True), dfs(i - 1, False) - prices[i])
+			return max(dfs(i - 1, False), dfs(i - 1, True) + prices[i])
+		return dfs(n - 1, False)
+
+# 87.买卖股票的最佳时机含冷冻期
+## 核心思想类似打家劫舍
+class Solution:
+	def maxProfit(self, prices):
+		n = len(prices)
+		@cache
+		def dfs(i, hold):
+			if i < 0:
+				return -inf if hold else 0
+			if hold:
+				return max(dfs(i - 1, True), dfs(i - 2, False) - prices[i])
+			return max(dfs(i - 1, False), dfs(i - 1, True) + prices[i])
+		return dfs(n - 1, False)		
+
+# 88.买卖股票的最佳时机3
+# 交易两次
+class Solution:
+	def maxProfit(self, prices):
+		n = len(prices)
+		@cache
+		def dfs(i, j, hold):
+			if j < 0:
+				return -inf
+			if i < 0:
+				return -inf if hold else 0
+			if hold:
+				return max(dfs(i - 1, j, True), dfs(i - 1, j, False) - prices[i])
+			return max(dfs(i - 1, j, False), dfs(i - 1, j - 1, True) + prices[i])
+		return dfs(n - 1, 2, False)	
+
+# 89.买卖股票的最佳时机5
+# 普通交易+做空交易
+## +p的时候也就是卖出的时候视为交易完成一次，可以用j - 1;-p也就是买入的时候视为交易完成一次可以用j - 1;二者选一种即可
+class Solution:
+	def maximumProfit(self, prices, k):
+		n = len(prices)
+		@cache
+		def dfs(i, j, state):
+			if j < 0:
+				return -inf
+			if i < 0:
+				return -inf if state else 0
+			p = prices[i]
+			if state == 0:
+				return max(dfs(i - 1, j, 0), dfs(i - 1, j, 1) + p, dfs(i - 1, j, 2) - p)
+			elif state == 1:
+				return max(dfs(i - 1, j, 1), dfs(i - 1, j - 1, 0) - p)
+			return max(dfs(i - 1, j, 2), dfs(i - 1, j - 1, 0) + p)	
+		ans = dfs(n - 1, k, 0)
+		dfs.cache_clear()
+		return ans
+
+# 90.买卖股票的最佳时机含手续费
+class Solution:
+	def maxProfit(self, prices, fee):
+		n = len(prices)
+		@cache
+		def dfs(i, state):
+			if i < 0:
+				return -inf if state else 0
+			if state:
+				return max(dfs(i - 1, state), dfs(i - 1, 0) - prices[i])
+			return max(dfs(i - 1, state), dfs(i - 1, 1) + prices[i] - fee)
+		return dfs(n - 1, 0)
+
+# 91.20250825对角线遍历
+## 灵神题解——枚举k,i + j = k,
+class Solution:
+	def findDiagonalOrder(self, mat):
+		m, n = len(mat), len(mat[0])
+		ans = []
+		for k in range(m + n - 1):
+			min_j = max(k - m + 1, 0)
+			max_j = min(k, n - 1)
+			if k % 2 == 0:  #偶数从小到大
+				for j in range(min_j, max_j + 1):
+					ans.append(mat[k - j][j])
+			else:
+				for j in range(max_j, min_j - 1, -1):
+					ans.append(mat[k - j][j])
+		return ans
+
+# 92.N皇后
+class Solution:
+	def solveNQueens(self, n):
+		
