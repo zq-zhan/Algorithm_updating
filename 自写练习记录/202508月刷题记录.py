@@ -2084,5 +2084,327 @@ class Solution:
 
 # 92.N皇后
 class Solution:
-	def solveNQueens(self, n):
-		
+    def solveNQueens(self, n):
+        ans = []
+        queens = [0] * n  # 皇后放在 (r,queens[r])
+        col = [False] * n
+        diag1 = [False] * (n * 2 - 1)
+        diag2 = [False] * (n * 2 - 1)
+        def dfs(r: int) -> None:
+            if r == n:
+                ans.append(['.' * c + 'Q' + '.' * (n - 1 - c) for c in queens])
+                return
+            # 在 (r,c) 放皇后
+            for c, ok in enumerate(col):
+                if not ok and not diag1[r + c] and not diag2[r - c]:  # 判断能否放皇后
+                    queens[r] = c  # 直接覆盖，无需恢复现场
+                    col[c] = diag1[r + c] = diag2[r - c] = True  # 皇后占用了 c 列和两条斜线
+                    dfs(r + 1)
+                    col[c] = diag1[r + c] = diag2[r - c] = False  # 恢复现场
+        dfs(0)
+        return ans
+
+# 93.超级饮料的最大强化能量
+class Solution:
+	def maxEnergyBoost(self, energyDrinkA, energyDrinkB):
+		n = len(energyDrinkA)
+		@cache
+		def dfs(i, state):
+			if i < 0:
+				return 0
+			if state == 0:
+				return max(dfs(i - 1, 0), dfs(i - 2, 1)) + energyDrinkA[i]
+			return max(dfs(i - 1, 1), dfs(i - 2, 0)) + energyDrinkB[i]
+		return max(dfs(n - 1, 0), dfs(n - 1, 1))
+
+# 94.选择建筑的方案数
+class Solution:  # 超出内存，恰好为k的买卖股票
+	def numberOfWays(self, s):
+		n = len(s)
+		@cache
+		def dfs(i, j, x):
+			if j < 0:
+				return 0
+			if i < 0:
+				return int(j == 0)
+			if s[i] == x:
+				return dfs(i - 1, j, x)
+			return dfs(i - 1, j, x) + dfs(i - 1, j - 1, s[i])
+		return dfs(n - 1, 3, -1)
+## 灵神题解——前后缀分解
+class Solution:
+	def numberOfWays(self, s):
+		n = len(s)
+		pre_0 = [0] * (n + 1)
+		suf_0 = [0] * (n + 1)
+		pre_1 = [0] * (n + 1)
+		suf_1 = [0] * (n + 1)
+		for i in range(n):
+			pre_0[i + 1] = pre_0[i] + int(s[i] == '0')
+			pre_1[i + 1] = pre_1[i] + int(s[i] == '1')
+		for i in range(n - 1, -1, -1):
+			suf_0[i] = suf_0[i + 1] + int(s[i] == '0')
+			suf_1[i] = suf_1[i + 1] + int(s[i] == '1')
+		ans = 0
+		for i, x in enumerate(s):
+			if x == '1':
+				ans += pre_0[i] * suf_0[i + 1]
+			else:
+				ans += pre_1[i] * suf_1[i + 1]
+		return ans
+		# tot_0 = s.count('0')
+		# ans = c0 = 0
+		# for i, x in enumerate(s):
+		# 	if x == '1':
+		# 		ans += c0 * (total - c0)
+		# 	else:
+		# 		c1 = i - c0
+		# 		ans += c1 * (len(s) - tot_0 - c1)
+		# 		c0 += 1
+		# return ans
+
+# 95.20250826对角线最长的矩形的面积
+class Solution:
+	def areaOfMaxDiagonal(self, dimensions):
+		ans = length = 0
+		for x, y in dimensions:
+			dig = x ** 2 + y ** 2
+			if dig > length:
+				length = dig
+				ans = x * y
+			elif dig == length:
+				ans = max(ans, x * y)
+		return ans
+## 灵神思路——多关键词比较
+class Solution:
+	def areaOfMaxDiagonal(self, dimensions):
+		return max((x * x + y * y, x * y) for x, y in dimensions)[1]
+
+# 96.一个小组的最大实力值
+## 回溯写法
+class Solution:
+	def maxStrength(self, nums):
+		res = -inf
+		path = []
+		def dfs(i):
+			nonlocal res
+			if i < 0:
+				if path:
+					temp = 1
+					for x in path:
+						temp *= x
+					res = max(res, temp)
+				return
+			# 选
+			path.append(nums[i])
+			dfs(i - 1)
+			path.pop()
+
+			# 不选
+			dfs(i - 1)
+		dfs(len(nums) - 1)
+		return res
+## 回溯写法二
+class Solution:
+	def maxStrength(self, nums):
+		n = len(nums)
+		ans = -inf
+		def dfs(i, temp, k):
+			nonlocal ans
+			if i < 0:
+				if k:
+					ans = max(ans, temp)
+				return
+			## 选
+			dfs(i - 1, temp * nums[i], k + 1)
+			## 不选
+			dfs(i - 1, temp, k)
+		dfs(n - 1, 1, 0)
+		return ans
+
+# 97.乘积为正数的最长子数组长度
+class Solution:  # 暴力解法，超时
+	def getMaxLen(self, nums):
+		ans = 0
+		n = len(nums)
+		for i in range(n):
+			temp = 1
+			for j in range(i, -1, -1):
+				temp *= nums[j]
+				if temp > 0:
+					ans = max(ans, j - i + 1)
+		return ans
+## 贪心思路
+class Solution:  
+	def getMaxLen(self, nums):
+		cntp = cntn = ans = st = 0
+		firstn = lastn = -1
+		for i, x in enumerate(nums):
+			if x == 0:
+				cntp = cntn = 0
+				firstn = lastn = -1
+				st = i + 1  # 起始下标
+			elif x > 0:
+				cntp += 1
+			else:
+				if firstn == -1:
+					firstn = i
+				lastn = i
+				cntn += 1
+			if cntn % 2 == 0:
+				ans = max(ans, cntp + cntn)
+			else:
+				ans = max(ans, i - firstn, lastn - st)
+		return ans
+
+# 98.访问数组中的位置使分数最大
+class Solution:
+	def maxScore(self, nums, x):
+		n = len(nums)
+		@cache
+		def dfs(i, t):
+			if i == n:
+				return 0
+			if nums[i] % 2 == t:  # 相同必选，
+				return dfs(i + 1, t) + nums[i]
+			return max(dfs(i + 1, t), dfs(i + 1, t ^ 1) - x + nums[i])  # 不同的时候比较
+		return dfs(0, nums[0] % 2)
+
+# 99.最大交替子序列和
+class Solution:
+	def maxAlternatingSum(self, nums):
+		@cache
+		def dfs(i, t):
+			if i < 0:
+				return 0
+			if t % 2 == 0:
+				return max(dfs(i - 1, t ^ 1) - nums[i], dfs(i - 1, t))
+			return max(dfs(i - 1, t ^ 1) + nums[i], dfs(i - 1, t))
+		return dfs(len(nums) - 1, 1)
+
+# 100.摆动序列
+class Solution:
+	def wiggleMaxLength(self, nums):
+		if all(nums) == 0:
+			return 1
+
+		n = len(nums)
+		@cache
+		def dfs(i, pre1, pre2):
+			if i == n:
+				return 0
+			if pre1 == -1 or pre2 == -1 or (pre1 - pre2) * (nums[i] - pre1) < 0:
+				return max(dfs(i + 1, nums[i], pre1) + 1, dfs(i + 1, pre1, pre2))
+			return dfs(i + 1, pre1, pre2)
+		return dfs(0, -1, -1)
+## 回溯解法
+class Solution:
+	def wiggleMaxLength(self, nums):
+		n = len(nums)
+		ans = 1
+		def dfs(i, path):
+			nonlocal ans
+			ans = max(ans, len(path))
+			if i == n:
+				return
+			
+			## 不选
+			if (len(path) > 1 and (path[-1] - path[-2]) * (nums[i] - path[-1]) >= 0) or (len(path) >= 1 and path[-1] == nums[i]):
+				dfs(i + 1, path)	
+			else:		
+				## 选
+				path.append(nums[i])
+				dfs(i + 1, path)
+				path.pop()  # 回溯
+		dfs(0, [])
+		return ans
+## 贪心
+class Solution:
+    def wiggleMaxLength(self, nums: List[int]) -> int:
+        # special condition
+        if len(nums) == 1: return 1      
+        start_by_True, st_need_flag = 1, False
+        start_by_False, sf_need_flag = 1, True
+        for i in range(1, len(nums)):
+            value = nums[i] - nums[i-1]
+            cur_flag = True if value > 0 else False
+            if value == 0:
+                continue
+            if cur_flag == st_need_flag:
+                start_by_True += 1
+                st_need_flag = not st_need_flag
+            if cur_flag == sf_need_flag:
+                start_by_False += 1
+                sf_need_flag = not sf_need_flag
+        return max(start_by_True, start_by_False)
+
+        
+
+# 101.20250828按对角线进行矩阵排序
+class Solution:
+	def sortMatrix(self, grid):
+		m, n = len(grid), len(grid[0])
+		for k in range(1, m + n):
+			min_j = max(n - k, 0)
+			max_j = min(m + n - 1 - k, n - 1)
+			a = [grid[k + j - n][j] for j in range(min_j, max_j + 1)]
+			a.sort(reverse = k >= n)
+			for j, val in zip(range(min_j, max_j + 1), a):
+				grid[k + j - n][j] = val
+		return grid
+
+# 102.20250829鲜花游戏
+class Solution:
+	def flowerGame(self, n, m):
+		n_ou = n // 2
+		m_ou = m // 2
+		n_ji = n - n_ou
+		m_ji = m - m_ou
+		return n_ou * m_ji + n_ji * m_ou
+
+# 103.20250830有效数独
+class Solution:
+	def isValidSudoku(self, board):
+		for row in board:
+			a = [x for x in row if x != '.']
+			if len(a) != len(set(a)):
+				return False
+		for j in range(n):
+			b = [row[j] for row in board if row[j] != '.']
+			if len(b) != len(set(b)):
+				return False
+		target = [(1,1), (1,4), (1,7), (4,1), (4,4), (4,7), (7,1), (7,4), (7,7)]
+		for x, y in target:
+			a = set()
+			for diff1 in (-1, 0, 1):
+				for diff2 in (-1, 0, 1):
+					num = board[x + diff1][y + diff2]
+					if num != '.':
+						if num not in a:
+							a.add(num)
+						else:
+							return False
+		return True
+
+# 104.矩阵置零
+class Solution:
+	def setZeroes(self, matrix):
+		m, n = len(matrix), len(matrix[0])
+		row_zero = set()
+		col_zero = set()
+		for i in range(m):
+			for j in range(n):
+				if matrix[i][j] == 0:
+					row_zero.add(i)
+					col_zero.add(j)
+		for i in range(m):
+			for j in range(n):
+				if i in row_zero or j in col_zero:
+					matrix[i][j] = 0
+				
+
+
+
+
+
+
