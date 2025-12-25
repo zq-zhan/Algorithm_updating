@@ -24,7 +24,7 @@ class StaticDNNLayer(nn.Module):
         
         sizes = [sparse_feature_dim * num_field + dense_feature_dim
                  ] + self.layer_sizes + [2] # 输入特征总维度+隐藏层维度+输出层维度(二分类)
-        acts = ["relu" for _ in range(len(self,layer_sizes))] + [None]
+        acts = ["relu" for _ in range(len(self.layer_sizes))] + [None]
         self._mlp_layers = []
         for i in range(len(layer_sizes) + 1):
             linear = paddle.nn.Linear(

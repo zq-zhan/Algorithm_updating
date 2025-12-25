@@ -1,3 +1,37 @@
+# item-aware Attention:当前候选item为Query,对用户历史行为进行加权,从而生成针对该item的用户兴趣表示
+# 输入:
+#     hist_items: [B, T] 用户历史点击的商品序列(商品id,商铺id,商品类型id),经过embedding后形成[B,T,D]
+#     target_item: [B, 1] 当前候选商品(商品id,商铺id,商品类型id),经过embedding后形成[B,1,D]
+# attention打分: 
+#     att_weight = softmax(MLP([q, h, q-h, q*h])),q为候选item,h为第i个历史行为
+#     weighted_sum/Interest(q) = sum(att_weight * h, axis = 1), [B, D]
+#     weighted_sum: [B, D],对axis=1求和
+# concat_vec: 拼接[Interest(q), target_item], [B, 2D]
+# 输出: 
+#     dnn_out = MLP(concat_vec)
+#     pred = sigmoid(dnn_out)
+#
+#
+# 为什么DIN一定要item-aware?
+#     因为item-aware Attention可以捕捉到用户对不同item的偏好,从而生成针对该item的用户兴趣表示,而不是仅仅关注用户的全局平均兴趣,导致多兴趣用户被抹平
+#     优缺点:
+#         优点: 显示建模多兴趣,用户表示和item强相关,CTR任务强target相关性
+#         缺点: 复杂度高,对每个候选item都要算一遍item,不适合召回
+# 为什么要concat?
+#     weighted_sum代表用户兴趣向量,target_item代表物品向量
+#     attention只影响如何聚合历史行为,如果预测网络只看到weighted_item则无法知道当前item
+#     weighted_sum != f(user, item),用了不代表传递了,target_item只用于算权重而不是求和,目的是从用户历史行为中提取出与当前item相关的兴趣,weighted_sum是hist_item的线性组合
+#     总结:虽然weighted_sum的权重由target_item决定,但最终向量仍是hist_item的线性组合,所以需要显式拼接target_item,才能让后续网络建模捕捉user-item的非线形交互
+#     concat的优势: 让模型自己学interaction(任意非线性)
+#
+# 为什么DIN用concat+MLP而不是点积?
+#     点积attention表达能力受embedding空间限制,而DIN可以用MLP捕捉复杂的非线性匹配关系,但计算更慢
+#     
+# 总结:
+#     DIN模型是一种item-aware Attention模型,以候选item为Query,通过对用户历史行为进行加权,
+#     生成针对当前候选item的用户兴趣表示,从而解决多兴趣用户的建模问题,提升召回效果
+
+
 import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F

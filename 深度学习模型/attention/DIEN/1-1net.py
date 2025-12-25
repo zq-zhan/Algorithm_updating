@@ -47,7 +47,7 @@ class DIENNet(nn.Layer):
             )
         )
         # 兴趣提取层GRU: 提取每个时间步的兴趣表示
-        self.interest_gru(embedding_dim, hidden_size)
+        self.interest_gru = nn.GRU(embedding_dim, hidden_size)
 
         # self.attention = AttentionUnit(hidden_size) # 注意力层
 
@@ -85,7 +85,7 @@ class DIENNet(nn.Layer):
         # att_weight = self.attention(target_emb, interest_hidden) # [B, T, 1]
 
         # 兴趣进化层AUGRU，使用注意力得分作为每一步的门控系数
-        h = paddle.zeors([B, interest_hidden.shape[-1]], dtype = interest_hidden.dtye) # 初始化一个形状为[B,H]的全0向量作为GRU的隐藏状态
+        h = paddle.zeros([B, interest_hidden.shape[-1]], dtype = interest_hidden.dtye) # 初始化一个形状为[B,H]的全0向量作为GRU的隐藏状态
         for t in range(T):
             att_score_t = F.sigmoid(
                 paddle.sum(interest_hidden[:, t, :] * target_emb, axis = -1, keepdim = True)

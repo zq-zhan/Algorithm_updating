@@ -2010,8 +2010,8 @@ class Solution:
 			if i < 0:
 				return -inf if hold else 0
 			if hold:
-				return max(dfs(i - 1, True), dfs(i - 2, False) - prices[i])
-			return max(dfs(i - 1, False), dfs(i - 1, True) + prices[i])
+				return max(dfs(i - 1, True), dfs(i - 2, False) - prices[i]) # 上一个未持有状态买入股票后这阶段变为持有
+			return max(dfs(i - 1, False), dfs(i - 1, True) + prices[i]) # 上一个持有状态卖出股票后这阶段变为未持有
 		return dfs(n - 1, False)		
 
 # 88.买卖股票的最佳时机3
